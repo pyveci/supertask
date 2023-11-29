@@ -1,0 +1,26 @@
+[
+  {
+    "id": 0,
+    "crontab": "2-3,59 * * * *",
+    "job": "select * from test",
+    "enabled": true,
+    "last_run": null,
+    "last_status": null
+  },
+  {
+    "id": 1,
+    "crontab": "* * * * *",
+    "job": "job3",
+    "enabled": false,
+    "last_run": null,
+    "last_status": null
+  },
+  {
+    "id": 3,
+    "crontab": "12-13,5,11 * * * *",
+    "job": "xxx",
+    "enabled": true,
+    "last_run": null,
+    "last_status": null
+  }
+]
