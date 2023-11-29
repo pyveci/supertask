@@ -2,7 +2,7 @@
   {
     "id": 0,
     "crontab": "2-3,59 * * * *",
-    "job": "select * from test",
+    "job": "select * from testx",
     "enabled": true,
     "last_run": null,
     "last_status": null

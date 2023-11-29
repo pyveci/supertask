@@ -11,7 +11,7 @@ from database import get_db, write_db
 from halo import Halo
 
 
-# Create a timezone object
+# Create a timezone object for Vienna
 timezone = pytz.timezone('Europe/Vienna')
 scheduler = BackgroundScheduler(timezone=timezone)
 
