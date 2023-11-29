@@ -11,7 +11,7 @@ class CronJob(BaseModel):
     last_run: Optional[Union[datetime, None]] = None
     last_status: Optional[Union[str, None]] = None
 
-    #@validator('crontab')
+    #@validator('crontab') - it is more complex than this
     def validate_crontab(cls, v):
         pattern = r"(((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*) ?){5,7}"
         if not re.match(pattern, v):
