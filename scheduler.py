@@ -8,12 +8,10 @@ import random
 import time
 
 def my_job(job="select 1"):
-    random_number = random.randint(5, 10)
-    start=time.strftime("%H:%M:%S", time.localtime())
-    ic(start, job)
+    random_number = random.randint(5, 10) # mock diffenrent job run times
+    start_time_str = time.strftime("%H:%M:%S", time.localtime())
     time.sleep(random_number)
-    end=time.strftime("%H:%M:%S", time.localtime())
-    ic("DONE", end, job)
+    ic("DONE", start_time_str , random_number , job)
 
 class FileChangeHandler(FileSystemEventHandler):
   def __init__(self, scheduler):
@@ -52,7 +50,7 @@ class FileChangeHandler(FileSystemEventHandler):
               if cronjob.enabled and str(cronjob.id) not in existing_job_ids:
                   #ic("ADD: ", cronjob.id)
                   minute, hour, day, month, day_of_week = cronjob.crontab.split()
-                  job = self.scheduler.add_job(my_job, 'cron', minute=minute, hour=hour, day=day, month=month, day_of_week=day_of_week, id=str(cronjob.id), jobstore='default', args=[cronjob.job], max_instances=4)
+                  job = self.scheduler.add_job(my_job, 'cron', minute=minute, hour=hour, day=day, month=month, day_of_week=day_of_week, id=str(cronjob.id), jobstore='default', args=[cronjob.job])
                   next_run_time = job.trigger.get_next_fire_time(None, datetime.now())
                   ic("ADDED: ", cronjob.job, next_run_time)
 

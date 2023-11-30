@@ -1,5 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.memory import MemoryJobStore
+from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from icecream import ic
@@ -13,7 +14,17 @@ from scheduler import FileChangeHandler, my_job
 
 # Create a timezone object for Vienna
 timezone = pytz.timezone('Europe/Vienna')
-scheduler = BackgroundScheduler(timezone=timezone)
+
+job_defaults = {
+    'coalesce': False,
+    'max_instances': 1
+}
+executors = {
+    'default': ThreadPoolExecutor(20),
+    'processpool': ProcessPoolExecutor(5)
+}
+
+scheduler = BackgroundScheduler(executors=executors, job_defaults=job_defaults, timezone=timezone)
 scheduler.add_jobstore(MemoryJobStore(), 'default')
 
 # Create an instance of FileChangeHandler with the scheduler
