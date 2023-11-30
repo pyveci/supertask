@@ -5,12 +5,23 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from icecream import ic
 import time
-import random
+import uvicorn
 import os
 import pytz
+import threading
 from database import get_db, write_db
 from halo import Halo
 from scheduler import FileChangeHandler, my_job
+from fastapi import FastAPI
+from cronjob_routes import router as cronjob_router
+
+def run_server():
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+
+app = FastAPI()
+app.include_router(cronjob_router)
+server_thread = threading.Thread(target=run_server)
+server_thread.start()
 
 # Create a timezone object for Vienna
 timezone = pytz.timezone('Europe/Vienna')
@@ -47,7 +58,7 @@ observer.schedule(file_change_handler, path=os.path.dirname(os.path.abspath('cro
 observer.start()
 
 start = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-ic(start)
+ic('//======= START ======', start)
 
 # Get next run time for all jobs
 jobs = scheduler.get_jobs()
