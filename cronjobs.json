@@ -1,7 +1,7 @@
 [
   {
     "id": 0,
-    "crontab": "2-3,59 * * * *",
+    "crontab": "2-3,25 * * * *",
     "job": "select * from testx",
     "enabled": true,
     "last_run": null,
@@ -18,7 +18,7 @@
   {
     "id": 3,
     "crontab": "12-13,5,11 * * * *",
-    "job": "xxx",
+    "job": "select 1",
     "enabled": true,
     "last_run": null,
     "last_status": null
