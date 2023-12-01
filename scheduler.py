@@ -8,10 +8,19 @@ import random
 import time
 
 def my_job(job="select 1"):
-    random_number = random.randint(5, 10) # mock diffenrent job run times
-    start_time_str = time.strftime("%H:%M:%S", time.localtime())
+
+    # Report about job start.
+    start = time.strftime("%H:%M:%S", time.localtime())
+    ic("JOB-START", job, start)
+
+    # Emulate a computing workload.
+    random_number = random.randint(5, 10)
     time.sleep(random_number)
-    ic("DONE", start_time_str , random_number , job)
+
+    # Report about job end.
+    result = random_number
+    end = time.strftime("%H:%M:%S", time.localtime())
+    ic("JOB-FINISH", job, start, end, result)
 
 class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
   def __init__(self, scheduler):
