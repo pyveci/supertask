@@ -11,7 +11,7 @@
     "id": 1,
     "crontab": "* * * * *",
     "job": "job3",
-    "enabled": false,
+    "enabled": true,
     "last_run": null,
     "last_status": null
   },

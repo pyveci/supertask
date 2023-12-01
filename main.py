@@ -1,5 +1,5 @@
 import logging
-
+import icecream
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
@@ -13,12 +13,16 @@ import pytz
 import threading
 from database import get_db, write_db
 from halo import Halo
+
+from jobstore_sqlalchemy import CrateDBSQLAlchemyJobStore
 from scheduler import FileChangeHandler, my_job
 from fastapi import FastAPI
 from cronjob_routes import router as cronjob_router
 from util import setup_logging
 
 logger = logging.getLogger(__name__)
+
+icecream.IceCreamDebugger.lineWrapWidth = 120
 
 
 class Supertask:
@@ -28,7 +32,23 @@ class Supertask:
         self.configure()
 
     def configure(self):
+        """
+        https://apscheduler.readthedocs.io/en/3.x/userguide.html#configuring-the-scheduler
+        """
         logger.info("Configuring scheduler")
+
+        # Initialize a job store.
+        # job_store = MemoryJobStore()
+        # job_store = SQLAlchemyJobStore(url="postgresql://postgres@localhost", engine_options={"echo": True})
+        # job_store = CrateDBMongoDBJobStore(dburi="crate://localhost")
+        job_store = CrateDBSQLAlchemyJobStore(url="crate://localhost/", engine_options={"echo": True})
+
+        # TODO: Only in sandbox mode, to have a fresh database canvas.
+        try:
+            job_store.remove_all_jobs()
+        except:
+            pass
+
         job_defaults = {
             'coalesce': False,
             'max_instances': 1
@@ -37,11 +57,13 @@ class Supertask:
             'default': ThreadPoolExecutor(20),
             'processpool': ProcessPoolExecutor(5)
         }
+        job_stores = {
+            'default': job_store,
+        }
 
         # Create a timezone object for Vienna
         timezone = pytz.timezone('Europe/Vienna')
-        self.scheduler = BackgroundScheduler(executors=executors, job_defaults=job_defaults, timezone=timezone)
-        self.scheduler.add_jobstore(MemoryJobStore(), 'default')
+        self.scheduler = BackgroundScheduler(executors=executors, job_defaults=job_defaults, jobstores=job_stores, timezone=timezone)
         logger.info(f"Configured scheduler: "
                     f"executors={self.scheduler._executors}, "
                     f"jobstores={self.scheduler._jobstores}, "
