@@ -16,4 +16,5 @@ def my_job(job="select 1"):
     # Report about job end.
     result = random_number
     end = time.strftime("%H:%M:%S", time.localtime())
+    print()  # noqa: T201
     ic("JOB-FINISH", job, start, end, result)

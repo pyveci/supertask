@@ -4,7 +4,7 @@ import colorlog
 from colorlog.escape_codes import escape_codes
 
 
-def setup_logging(level=logging.INFO, debug: bool = False, width: int = 26):
+def setup_logging(level=logging.INFO, debug: bool = False, width: int = 30):
     reset = escape_codes["reset"]
     log_format = f"%(asctime)-15s [%(name)-{width}s] %(log_color)s%(levelname)-8s:{reset} %(message)s"
 

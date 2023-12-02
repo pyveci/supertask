@@ -22,7 +22,7 @@ class JobSeeder:
         self.start_observer = start_observer
 
     def seed_jobs(self):
-        logger.info("Seeding jobs")
+        logger.info(f"Seeding jobs from: {self.source}")
         # Initial load of jobs from cronjobs.json
         cronjobs = JsonResource(self.source).read()
         for cronjob in cronjobs:

@@ -99,10 +99,8 @@ class Supertask:
     def start_scheduler(self):
         logger.info("Starting scheduler")
         self.scheduler.start()
-        start = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        ic("//======= START ======", start)
 
-        # Get next run time for all jobs
+        # Get next run time for all jobs.
         jobs = self.scheduler.get_jobs()
         for job in jobs:
             ic(job.id, job.next_run_time)
