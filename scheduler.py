@@ -13,7 +13,7 @@ def my_job(job="select 1"):
     time.sleep(random_number)
     ic("DONE", start_time_str , random_number , job)
 
-class FileChangeHandler(FileSystemEventHandler):
+class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
   def __init__(self, scheduler):
       self.scheduler = scheduler
       self.last_modified = time.time()

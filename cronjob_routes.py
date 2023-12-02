@@ -48,7 +48,7 @@ def delete_cronjob(cronjob_id: int, db=Depends(get_db)):
     return cronjob
 
 @router.get("/", response_class=HTMLResponse)
-async def read_items(request: Request):
+async def jobs_page(request: Request):
     with open('cronjobs.json') as f:
         data = json.load(f)
     jobs = [CronJob(**job) for job in data]
