@@ -16,3 +16,4 @@
   from user space
 - Get rid of global `CRONJOBS_JSON` variable
 - Improve software tests and documentation
+- Settings: Obtain environment variables from `.env` file
