@@ -1,5 +1,6 @@
 import logging
 import icecream
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
@@ -27,7 +28,9 @@ icecream.IceCreamDebugger.lineWrapWidth = 120
 
 class Supertask:
 
-    def __init__(self):
+    def __init__(self, job_store_address: str, pre_delete_jobs: bool = False):
+        self.job_store_address = job_store_address
+        self.pre_delete_jobs = pre_delete_jobs
         self.scheduler: BackgroundScheduler = None
         self.configure()
 
@@ -38,16 +41,20 @@ class Supertask:
         logger.info("Configuring scheduler")
 
         # Initialize a job store.
-        # job_store = MemoryJobStore()
-        # job_store = SQLAlchemyJobStore(url="postgresql://postgres@localhost", engine_options={"echo": True})
-        # job_store = CrateDBMongoDBJobStore(dburi="crate://localhost")
-        job_store = CrateDBSQLAlchemyJobStore(url="crate://localhost/", engine_options={"echo": True})
+        if self.job_store_address.startswith("memory://"):
+            job_store = MemoryJobStore()
+        elif self.job_store_address.startswith("postgresql://"):
+            job_store = SQLAlchemyJobStore(url=self.job_store_address, engine_options={"echo": True})
+        elif self.job_store_address.startswith("crate://"):
+            job_store = CrateDBSQLAlchemyJobStore(url=self.job_store_address, engine_options={"echo": True})
+        else:
+            raise RuntimeError(f"Initializing job store failed. Unknown address: {self.job_store_address}")
 
-        # TODO: Only in sandbox mode, to have a fresh database canvas.
-        try:
-            job_store.remove_all_jobs()
-        except:
-            pass
+        if self.pre_delete_jobs:
+            try:
+                job_store.remove_all_jobs()
+            except:
+                pass
 
         job_defaults = {
             'coalesce': False,
@@ -140,13 +147,18 @@ class Supertask:
         return self
 
 
-def main():
+def run_supertask(job_store_address: str, pre_delete_jobs: bool = False):
     setup_logging()
-    st = Supertask()
+    st = Supertask(job_store_address=job_store_address, pre_delete_jobs=pre_delete_jobs)
     st.seed_jobs()
     st.start()
-    st.wait()
+    return st
 
 
 if __name__ == "__main__":
-    main()
+    # TODO: Use only in sandbox mode, to have a fresh database canvas.
+    pre_delete_jobs = True
+    #main(job_store_address="memory://", pre_delete_jobs=pre_delete_jobs)
+    #main(job_store_address="postgresql://postgres@localhost", pre_delete_jobs=pre_delete_jobs)
+    st = run_supertask(job_store_address="crate://localhost", pre_delete_jobs=pre_delete_jobs)
+    st.wait()
