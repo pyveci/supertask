@@ -25,6 +25,14 @@ pip install -r requirements.txt -r requirements-dev.txt
 ```
 
 
+## Usage
+
+Run scheduler daemon, with pre-seeded example jobs.
+```shell
+python main.py
+```
+
+
 ## Development
 
 Run software tests.

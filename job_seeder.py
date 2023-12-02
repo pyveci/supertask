@@ -1,26 +1,48 @@
-from apscheduler.schedulers.background import BackgroundScheduler
-from watchdog.events import FileSystemEventHandler
-from icecream import ic
-from database import get_db, write_db
-from datetime import datetime
-
-import random
+import logging
+import os
 import time
+import datetime as dt
 
-def my_job(job="select 1"):
+from icecream import ic
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
-    # Report about job start.
-    start = time.strftime("%H:%M:%S", time.localtime())
-    ic("JOB-START", job, start)
+from database import get_db, CRONJOBS_JSON
+from jobs import my_job
 
-    # Emulate a computing workload.
-    random_number = random.randint(5, 10)
-    time.sleep(random_number)
+logger = logging.getLogger(__name__)
 
-    # Report about job end.
-    result = random_number
-    end = time.strftime("%H:%M:%S", time.localtime())
-    ic("JOB-FINISH", job, start, end, result)
+
+class JobSeeder:
+
+    def __init__(self, scheduler, start_observer: bool = False):
+        self.scheduler = scheduler
+        self.start_observer = start_observer
+
+    def seed_jobs(self):
+        logger.info("Seeding jobs")
+        # Initial load of jobs from cronjobs.json
+        cronjobs = get_db()
+        for cronjob in cronjobs:
+            if cronjob.enabled:
+                ic(cronjob)
+                minute, hour, day, month, day_of_week = cronjob.crontab.split()
+                self.scheduler.add_job(my_job, 'cron', minute=minute, hour=hour, day=day, month=month,
+                                       day_of_week=day_of_week, id=str(cronjob.id), jobstore='default', args=[cronjob.job],
+                                       max_instances=4)
+        return self
+
+    def start_filesystem_observer(self):
+        logger.info("Starting filesystem observer")
+        # Create an instance of FileChangeHandler with the scheduler
+        file_change_handler = FileChangeHandler(self.scheduler)
+
+        # Watch cronjobs.json for changes in scheduled jobs
+        observer = Observer()
+        observer.schedule(file_change_handler, path=os.path.dirname(os.path.abspath(CRONJOBS_JSON)))
+        observer.start()
+        return self
+
 
 class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
   def __init__(self, scheduler):
@@ -33,7 +55,7 @@ class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
 
       self.last_modified = time.time()
 
-      if not event.is_directory and event.src_path.endswith('cronjobs.json'):
+      if not event.is_directory and event.src_path.endswith(CRONJOBS_JSON):
           # Load jobs from cronjobs.json
           ic("FILE CHANGED")
           cronjobs = get_db()
@@ -60,7 +82,7 @@ class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
                   #ic("ADD: ", cronjob.id)
                   minute, hour, day, month, day_of_week = cronjob.crontab.split()
                   job = self.scheduler.add_job(my_job, 'cron', minute=minute, hour=hour, day=day, month=month, day_of_week=day_of_week, id=str(cronjob.id), jobstore='default', args=[cronjob.job])
-                  next_run_time = job.trigger.get_next_fire_time(None, datetime.now())
+                  next_run_time = job.trigger.get_next_fire_time(None, dt.datetime.now())
                   ic("ADDED: ", cronjob.job, next_run_time)
 
           # Reschedule existing jobs

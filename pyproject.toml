@@ -1,6 +1,18 @@
 [tool.black]
 line-length = 120
 
+[tool.coverage.run]
+branch = false
+omit = [
+  "tests/*",
+  "test_*.py",
+]
+# source = ["supertask"]
+
+[tool.coverage.report]
+fail_under = 0
+show_missing = true
+
 [tool.mypy]
 packages = ["supertask"]
 exclude = [
@@ -21,8 +33,7 @@ log_level = "DEBUG"
 log_cli_level = "DEBUG"
 log_format = "%(asctime)-15s [%(name)-36s] %(levelname)-8s: %(message)s"
 testpaths = [
-  "tests",
-  ".",
+  "test_*.py",
 ]
 xfail_strict = true
 markers = [

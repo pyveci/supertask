@@ -7,6 +7,7 @@ ruff==0.1.6
 validate-pyproject<0.16
 
 # Software tests
+cratedb-toolkit==0.0.2
 httpx<0.26
 psycopg2-binary<3
 pytest<8
