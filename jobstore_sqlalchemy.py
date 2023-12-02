@@ -49,8 +49,6 @@ class LargeBinary(sa.String):
 class CrateDBSQLAlchemyJobStore(SQLAlchemyJobStore):
     def __init__(self, *args, **kwargs):
         self.patchme()
-        kwargs.setdefault("tablename", "jobs")
-        kwargs.setdefault("metadata", sa.MetaData(schema="ext"))
         super().__init__(*args, **kwargs)
 
         def receive_after_execute(

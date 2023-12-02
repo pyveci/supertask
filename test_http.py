@@ -17,7 +17,7 @@ client = TestClient(app)
 def foo(cronjobs_json_file):
     # Inject settings as dependency to FastAPI. Thanks, @Mause.
     # https://github.com/tiangolo/fastapi/issues/2372#issuecomment-732492116
-    app.dependency_overrides[Settings] = lambda: Settings(store_address=None, pre_delete_jobs=None, pre_seed_jobs=cronjobs_json_file)
+    app.dependency_overrides[Settings] = lambda: Settings(store_location=None, pre_delete_jobs=None, pre_seed_jobs=cronjobs_json_file)
 
 
 @pytest.fixture

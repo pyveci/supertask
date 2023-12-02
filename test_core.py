@@ -8,6 +8,7 @@ from cratedb_toolkit.util import DatabaseAdapter
 
 from core import Supertask
 from job_seeder import JobSeeder
+from models import JobStoreLocation
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ def check_store(address: str):
 def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_file):
     check_store(job_store_address)
 
-    st = Supertask(job_store_address=job_store_address, pre_delete_jobs=True, pre_seed_jobs=cronjobs_json_file)
+    st = Supertask(store=job_store_address, pre_delete_jobs=True, pre_seed_jobs=cronjobs_json_file)
     js = JobSeeder(source=cronjobs_json_file, scheduler=st.scheduler)
     js.seed_jobs()
     st.start()
@@ -49,7 +50,7 @@ def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_f
 def test_supertask_stores_seeded_url(caplog, job_store_address, cronjobs_json_url):
     check_store(job_store_address)
 
-    st = Supertask(job_store_address=job_store_address, pre_delete_jobs=True, pre_seed_jobs=cronjobs_json_url)
+    st = Supertask(store=job_store_address, pre_delete_jobs=True, pre_seed_jobs=cronjobs_json_url)
     js = JobSeeder(source=cronjobs_json_url, scheduler=st.scheduler)
     js.seed_jobs()
     st.start()
@@ -69,7 +70,7 @@ def test_supertask_cratedb_store(caplog):
     # Create a job using Supertask.
     job_store_address = "crate://crate@localhost/"
     check_store(job_store_address)
-    st = Supertask(job_store_address, pre_delete_jobs=True)
+    st = Supertask(JobStoreLocation(address=job_store_address), pre_delete_jobs=True)
     reference_time = dt.datetime(year=8022, month=1, day=1, tzinfo=dt.timezone.utc)
     st.scheduler.add_job(
         dummy_job, args=["something"], trigger="interval", id="foo", name="bar", next_run_time=reference_time
@@ -81,6 +82,31 @@ def test_supertask_cratedb_store(caplog):
     assert cratedb.table_exists("ext.jobs")
     assert cratedb.count_records("ext.jobs") == 1
     assert cratedb.run_sql("SELECT * FROM ext.jobs", records=True) == [
+        {"id": "foo", "job_state": mock.ANY, "next_run_time": reference_time.timestamp()}
+    ]
+
+
+def test_supertask_cratedb_custom_schema_and_table(caplog):
+    # Create a job using Supertask.
+    job_store_address = "crate://crate@localhost/"
+    check_store(job_store_address)
+    store_location = JobStoreLocation(
+        address=job_store_address,
+        schema="foo",
+        table="bar",
+    )
+    st = Supertask(store_location, pre_delete_jobs=True)
+    reference_time = dt.datetime(year=8022, month=1, day=1, tzinfo=dt.timezone.utc)
+    st.scheduler.add_job(
+        dummy_job, args=["something"], trigger="interval", id="foo", name="bar", next_run_time=reference_time
+    )
+    st.start()
+
+    # Verify the job has been stored into CrateDB.
+    cratedb = DatabaseAdapter(dburi=job_store_address)
+    assert cratedb.table_exists("foo.bar")
+    assert cratedb.count_records("foo.bar") == 1
+    assert cratedb.run_sql("SELECT * FROM foo.bar", records=True) == [
         {"id": "foo", "job_state": mock.ANY, "next_run_time": reference_time.timestamp()}
     ]
 
