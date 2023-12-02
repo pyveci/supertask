@@ -22,7 +22,6 @@ interfaces, and others.
   from the local filesystem, or from a remote URL. When using the filesystem,
   a watchdog monitors the file for changes, in order to keep the crontabs
   up-to-date.
-- Minimal web interface (work-in-progress)
 
 
 ## Status

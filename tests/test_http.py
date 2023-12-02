@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from starlette.testclient import TestClient
 
 from supertask.http.routes import router
-from supertask.settings import Settings
+from supertask.model import Settings
 
 app = FastAPI()
 app.include_router(router)

@@ -38,7 +38,7 @@ def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_f
     st.start()
 
     assert "Configuring scheduler" in caplog.messages
-    assert "Seeding jobs" in caplog.messages
+    assert "Seeding jobs" in caplog.text
     assert "Adding job tentatively -- it will be properly scheduled when the scheduler starts" in caplog.messages
     assert "Starting scheduler" in caplog.messages
     assert 'Added job "my_job" to job store "default"' in caplog.messages
@@ -56,7 +56,7 @@ def test_supertask_stores_seeded_url(caplog, job_store_address, cronjobs_json_ur
     st.start()
 
     assert "Configuring scheduler" in caplog.messages
-    assert "Seeding jobs" in caplog.messages
+    assert "Seeding jobs" in caplog.text
     assert "Adding job tentatively -- it will be properly scheduled when the scheduler starts" in caplog.messages
     assert "Starting scheduler" in caplog.messages
     assert 'Added job "my_job" to job store "default"' in caplog.messages
