@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from starlette.testclient import TestClient
 
 from cronjob_routes import router
+from settings import Settings
 
 app = FastAPI()
 app.include_router(router)
@@ -12,11 +13,17 @@ app.include_router(router)
 client = TestClient(app)
 
 
+@pytest.fixture(scope="module", autouse=True)
+def foo(cronjobs_json_file):
+    # Inject settings as dependency to FastAPI. Thanks, @Mause.
+    # https://github.com/tiangolo/fastapi/issues/2372#issuecomment-732492116
+    app.dependency_overrides[Settings] = lambda: Settings(store_address=None, pre_delete_jobs=None, pre_seed_jobs=cronjobs_json_file)
+
+
 @pytest.fixture
 def write_noop(mocker):
     # Prevent _actually_ writing the `cronjobs.json` file.
-    mocker.patch("database.write_db")
-    mocker.patch("cronjob_routes.write_db")
+    mocker.patch("database.JsonResource.write")
 
 
 def test_create_cronjob(write_noop):

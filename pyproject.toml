@@ -1,3 +1,14 @@
+[project]
+name = "supertask"
+version = "0.0.0"
+
+[tool.setuptools]
+py-modules = ["cli", "core", "cronjob_routes", "database", "job_seeder", "jobs", "jobstore_sqlalchemy", "models", "settings", "util"]
+
+[project.scripts]
+supertask = "cli:cli"
+st = "cli:cli"
+
 [tool.black]
 line-length = 120
 

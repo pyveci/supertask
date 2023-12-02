@@ -8,6 +8,7 @@ halo<0.1
 icecream<3
 Jinja2<4
 MarkupSafe<3
+pueblo[fileio] @ git+https://github.com/pyveci/pueblo@more-io
 pydantic<3
 python-multipart==0.0.6
 uvicorn<0.25

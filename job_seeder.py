@@ -3,11 +3,12 @@ import os
 import time
 import datetime as dt
 
+from apscheduler.schedulers.base import BaseScheduler
 from icecream import ic
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from database import get_db, CRONJOBS_JSON
+from database import JsonResource
 from jobs import my_job
 
 logger = logging.getLogger(__name__)
@@ -15,14 +16,15 @@ logger = logging.getLogger(__name__)
 
 class JobSeeder:
 
-    def __init__(self, scheduler, start_observer: bool = False):
+    def __init__(self, source: str, scheduler: BaseScheduler, start_observer: bool = False):
+        self.source = source
         self.scheduler = scheduler
         self.start_observer = start_observer
 
     def seed_jobs(self):
         logger.info("Seeding jobs")
         # Initial load of jobs from cronjobs.json
-        cronjobs = get_db()
+        cronjobs = JsonResource(self.source).read()
         for cronjob in cronjobs:
             if cronjob.enabled:
                 ic(cronjob)
@@ -35,17 +37,18 @@ class JobSeeder:
     def start_filesystem_observer(self):
         logger.info("Starting filesystem observer")
         # Create an instance of FileChangeHandler with the scheduler
-        file_change_handler = FileChangeHandler(self.scheduler)
+        file_change_handler = FileChangeHandler(source=self.source, scheduler=self.scheduler)
 
         # Watch cronjobs.json for changes in scheduled jobs
         observer = Observer()
-        observer.schedule(file_change_handler, path=os.path.dirname(os.path.abspath(CRONJOBS_JSON)))
+        observer.schedule(file_change_handler, path=os.path.dirname(os.path.abspath(self.source)))
         observer.start()
         return self
 
 
 class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
-  def __init__(self, scheduler):
+  def __init__(self, source: str, scheduler: BaseScheduler):
+      self.source = source
       self.scheduler = scheduler
       self.last_modified = time.time()
 
@@ -55,10 +58,10 @@ class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
 
       self.last_modified = time.time()
 
-      if not event.is_directory and event.src_path.endswith(CRONJOBS_JSON):
+      if not event.is_directory and event.src_path.endswith(self.source):
           # Load jobs from cronjobs.json
           ic("FILE CHANGED")
-          cronjobs = get_db()
+          cronjobs = JsonResource(self.source).read()
           cronjob_ids = [str(cronjob.id) for cronjob in cronjobs]
           ic(cronjob_ids)
 
