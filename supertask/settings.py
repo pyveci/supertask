@@ -1,7 +1,7 @@
 import dataclasses
 import typing as t
 
-from models import JobStoreLocation
+from .model import JobStoreLocation
 
 
 @dataclasses.dataclass

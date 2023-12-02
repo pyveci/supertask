@@ -7,9 +7,9 @@ from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from database import JsonResource
-from models import CronJob
-from settings import Settings
+from supertask.model import CronJob
+from supertask.provision.database import JsonResource
+from supertask.settings import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ def get_json_resource(settings: Settings = Depends()) -> JsonResource:
     """
     FastAPI Dependency to provide a JsonResource instance to the request handlers.
     """
-    from database import JsonResource
+    from supertask.provision.database import JsonResource
 
     if settings.pre_seed_jobs is None:
         msg = "No web UI without pre-seed file"

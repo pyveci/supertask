@@ -3,7 +3,7 @@ import typing as t
 
 from pueblo.io import to_io
 
-from models import CronJob
+from supertask.model import CronJob
 
 # Sample data storex
 cronjobs_db: t.List[CronJob] = []

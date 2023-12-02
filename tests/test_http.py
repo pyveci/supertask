@@ -4,8 +4,8 @@ import pytest
 from fastapi import FastAPI
 from starlette.testclient import TestClient
 
-from cronjob_routes import router
-from settings import Settings
+from supertask.http.routes import router
+from supertask.settings import Settings
 
 app = FastAPI()
 app.include_router(router)
@@ -25,7 +25,7 @@ def foo(cronjobs_json_file):
 @pytest.fixture
 def write_noop(mocker):
     # Prevent _actually_ writing the `cronjobs.json` file.
-    mocker.patch("database.JsonResource.write")
+    mocker.patch("supertask.provision.database.JsonResource.write")
 
 
 def test_create_cronjob(write_noop):

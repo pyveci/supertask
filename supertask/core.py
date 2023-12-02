@@ -15,10 +15,10 @@ from fastapi import FastAPI
 from halo import Halo
 from icecream import ic
 
-from cronjob_routes import router as cronjob_router
-from jobstore_sqlalchemy import CrateDBSQLAlchemyJobStore
-from models import JobStoreLocation
-from settings import Settings
+from supertask.http.routes import router as cronjob_router
+from supertask.model import JobStoreLocation
+from supertask.settings import Settings
+from supertask.store.sqlalchemy import CrateDBSQLAlchemyJobStore
 
 logger = logging.getLogger(__name__)
 

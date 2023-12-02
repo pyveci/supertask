@@ -67,8 +67,6 @@ jobs:
         cache: 'pip'
         cache-dependency-path:
           pyproject.toml
-          requirements.txt
-          requirements-dev.txt
 
     - name: Set up project
       run: |
@@ -78,7 +76,6 @@ jobs:
         pip install "setuptools>=64" --upgrade
 
         # Install package in editable mode.
-        pip install --prefer-binary -r requirements.txt -r requirements-dev.txt
         pip install --prefer-binary --editable=.[test,develop]
 
     - name: Run linter and software tests

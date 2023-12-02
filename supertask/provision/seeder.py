@@ -8,8 +8,9 @@ from icecream import ic
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from database import JsonResource
-from jobs import my_job
+from supertask.vendor.jobs import my_job
+
+from .database import JsonResource
 
 logger = logging.getLogger(__name__)
 
