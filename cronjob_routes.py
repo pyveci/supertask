@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse
 from fastapi import Request
 from models import CronJob
 from typing import List
-from database import get_db, write_db
+from database import get_db, write_db, CRONJOBS_JSON
 import json
 
 router = APIRouter()
@@ -49,7 +49,7 @@ def delete_cronjob(cronjob_id: int, db=Depends(get_db)):
 
 @router.get("/", response_class=HTMLResponse)
 async def jobs_page(request: Request):
-    with open('cronjobs.json') as f:
+    with open(CRONJOBS_JSON) as f:
         data = json.load(f)
     jobs = [CronJob(**job) for job in data]
     return templates.TemplateResponse("jobs.html", {"request": request, "jobs": jobs})

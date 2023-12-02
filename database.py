@@ -1,6 +1,7 @@
 import json
 from models import CronJob
 
+CRONJOBS_JSON = 'cronjobs.json'
 
 # Sample data storex
 cronjobs_db = []
@@ -14,7 +15,7 @@ cronjobs_db = []
 # cronjobs_db = [CronJob(**cronjob) for cronjob in sample_cronjobs_data]
 
 def get_db():
-    with open('cronjobs.json', 'r') as f:
+    with open(CRONJOBS_JSON, 'r') as f:
         cronjobs_data = json.load(f)
     for cronjob in cronjobs_data:
         if 'id' in cronjob:
@@ -24,5 +25,5 @@ def get_db():
 
 def write_db(db):
     cronjobs_data = [cronjob.dict() for cronjob in db]
-    with open('cronjobs.json', 'w') as f:
+    with open(CRONJOBS_JSON, 'w') as f:
         json.dump(cronjobs_data, f)
