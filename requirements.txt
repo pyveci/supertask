@@ -4,6 +4,7 @@ APScheduler==3.10.4
 asttokens==2.4.1
 click==8.1.7
 colorama==0.4.6
+colorlog<7
 exceptiongroup==1.2.0
 executing==2.0.1
 fastapi==0.104.1
