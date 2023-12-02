@@ -1,8 +1,12 @@
 import click
+from dotenv import load_dotenv, find_dotenv
 
 from core import Supertask
 from job_seeder import JobSeeder
 from util import setup_logging
+
+
+load_dotenv(find_dotenv())
 
 
 @click.command()
@@ -12,7 +16,8 @@ from util import setup_logging
 @click.option("--http-listen-address", envvar="ST_HTTP_LISTEN_ADDRESS", type=str, required=False, help="HTTP API service listen address")
 @click.option("--verbose", is_flag=True, required=False, default=True, help="Turn logging on/off")
 @click.option("--debug", is_flag=True, required=False, help="Turn on logging with debug level")
-def cli(store_address: str, pre_delete_jobs: bool, pre_seed_jobs: str, http_listen_address: str, verbose: bool, debug: bool):
+@click.pass_context
+def cli(ctx: click.Context, store_address: str, pre_delete_jobs: bool, pre_seed_jobs: str, http_listen_address: str, verbose: bool, debug: bool):
     if verbose:
         setup_logging(debug=debug)
     st = Supertask(job_store_address=store_address, pre_delete_jobs=pre_delete_jobs, pre_seed_jobs=pre_seed_jobs)
