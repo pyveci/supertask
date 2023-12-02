@@ -1,15 +1,72 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+  "setuptools>=42", # At least v42 of setuptools required.
+  "versioningit",
+]
+
+[tool.versioningit.vcs]
+method = "git"
+default-tag = "0.0.0"
+
 [project]
 name = "supertask"
-version = "0.0.0"
-
-[tool.setuptools]
-py-modules = ["cli", "core", "cronjob_routes", "database", "job_seeder", "jobs", "jobstore_sqlalchemy", "models", "settings", "util"]
-
+dynamic = [
+  "version",
+]
+dependencies = [
+  "APScheduler<4",
+  "click<9",
+  "colorama<0.5",
+  "colorlog<7",
+  "crate[sqlalchemy]",
+  "fastapi<0.105",
+  "halo<0.1",
+  "icecream<3",
+  "Jinja2<4",
+  "MarkupSafe<3",
+  "pueblo[fileio]@ git+https://github.com/pyveci/pueblo@more-io",
+  "pydantic<3",
+  "python-dotenv[cli]<2",
+  "python-multipart==0.0.6",
+  "uvicorn<0.25",
+  "watchdog<4",
+]
+[project.optional-dependencies]
+develop = [
+  "black<24",
+  "mypy==1.7.1",
+  "poethepoet<0.25",
+  "pyproject-fmt<1.6",
+  "ruff==0.1.6",
+  "validate-pyproject<0.16",
+]
+release = [
+  "build<2",
+  "twine<5",
+]
+test = [
+  "cratedb-toolkit==0.0.2",
+  "httpx<0.26",
+  "psycopg2-binary<3",
+  "pytest<8",
+  "pytest-cov<5",
+  "pytest-mock<4",
+]
+[project.urls]
+changelog = "https://github.com/WalBeh/scheduler-playground/blob/master/CHANGES.rst"
+documentation = "https://github.com/WalBeh/scheduler-playground"
+homepage = "https://github.com/WalBeh/scheduler-playground"
+repository = "https://github.com/WalBeh/scheduler-playground"
 [project.scripts]
-st = "cli:cli"
-supertask = "cli:cli"
+st = "supertask.cli:cli"
+supertask = "supertask.cli:cli"
+
 [tool.black]
 line-length = 120
+
+[tool.setuptools]
+packages = ["supertask"]
 
 [tool.coverage.run]
 branch = false
@@ -17,16 +74,15 @@ omit = [
   "tests/*",
   "test_*.py",
 ]
-# source = ["supertask"]
+source = ["supertask"]
 
 [tool.coverage.report]
 fail_under = 0
 show_missing = true
 
 [tool.mypy]
-packages = ["cli", "core", "cronjob_routes", "database", "job_seeder", "jobs", "jobstore_sqlalchemy", "models", "settings", "util"]
-exclude = [
-]
+packages = ["supertask"]
+exclude = []
 check_untyped_defs = true
 ignore_missing_imports = true
 implicit_optional = true
@@ -43,7 +99,7 @@ log_level = "DEBUG"
 log_cli_level = "DEBUG"
 log_format = "%(asctime)-15s [%(name)-36s] %(levelname)-8s: %(message)s"
 testpaths = [
-  "test_*.py",
+  "tests",
 ]
 xfail_strict = true
 markers = [

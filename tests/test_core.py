@@ -6,9 +6,9 @@ import pytest
 import sqlalchemy as sa
 from cratedb_toolkit.util import DatabaseAdapter
 
-from core import Supertask
-from job_seeder import JobSeeder
-from models import JobStoreLocation
+from supertask.core import Supertask
+from supertask.model import JobStoreLocation
+from supertask.provision.seeder import JobSeeder
 
 logger = logging.getLogger(__name__)
 

@@ -1,10 +1,10 @@
 import click
 from dotenv import find_dotenv, load_dotenv
 
-from core import Supertask
-from job_seeder import JobSeeder
-from models import JobStoreLocation
-from util import setup_logging
+from supertask.core import Supertask
+from supertask.model import JobStoreLocation
+from supertask.provision.seeder import JobSeeder
+from supertask.util import setup_logging
 
 # TODO: Gate behind an environment variable?
 load_dotenv(find_dotenv())
