@@ -1,7 +1,6 @@
 # Supertask backlog
 
 ## Iteration +1
-- Config: Obtain job store schema- and table names alongside database address
 - Use regular logging instead of `icecream`
 - Format code
 - Are short-interval jobs possible?
@@ -9,6 +8,9 @@
 
 ## Iteration +2
 - Add `JobExecution` subsystem derived from `django-apscheduler`
+- Wrapper around Job execution
+- Success / failure notifications
+- SDK interface, with examples
 - When web server start is request, but it fails, shutdown the application
   ```
   ERROR:    [Errno 8] nodename nor servname provided, or not known
@@ -24,3 +26,4 @@
 ## Done
 - Config: Obtain HTTP listen address
 - Config: Obtain path/URL to seed file per CLI argument `--seed=cronjobs.json`
+- Config: Obtain job store schema- and table names alongside database address

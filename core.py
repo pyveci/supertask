@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 from icecream import ic
+import typing as t
 import time
 import uvicorn
 import os
@@ -12,6 +13,7 @@ import pytz
 import threading
 from halo import Halo
 
+from models import JobStoreLocation
 from settings import Settings
 from jobstore_sqlalchemy import CrateDBSQLAlchemyJobStore
 from fastapi import FastAPI
@@ -26,11 +28,13 @@ class Supertask:
 
     SQLALCHEMY_ECHO = False
 
-    def __init__(self, job_store_address: str, pre_delete_jobs: bool = False, pre_seed_jobs: str = None, debug: bool = False):
+    def __init__(self, store: t.Union[JobStoreLocation, str], pre_delete_jobs: bool = False, pre_seed_jobs: str = None, debug: bool = False):
 
         # Bundle settings to be able to propagate them to the FastAPI subsystem.
+        if isinstance(store, str):
+            store = JobStoreLocation(address=store)
         self.settings = Settings(
-            store_address=job_store_address,
+            store_location=store,
             pre_delete_jobs=pre_delete_jobs,
             pre_seed_jobs=pre_seed_jobs,
         )
@@ -45,14 +49,18 @@ class Supertask:
         logger.info("Configuring scheduler")
 
         # Initialize a job store.
-        if self.settings.store_address.startswith("memory://"):
+        address = self.settings.store_location.address
+        schema = self.settings.store_location.schema
+        table = self.settings.store_location.table
+        if address.startswith("memory://"):
             job_store = MemoryJobStore()
-        elif self.settings.store_address.startswith("postgresql://"):
-            job_store = SQLAlchemyJobStore(url=self.settings.store_address, engine_options={"echo": self.SQLALCHEMY_ECHO})
-        elif self.settings.store_address.startswith("crate://"):
-            job_store = CrateDBSQLAlchemyJobStore(url=self.settings.store_address, engine_options={"echo": self.SQLALCHEMY_ECHO})
+        elif address.startswith("postgresql://"):
+            # TODO: Need to run `CREATE SCHEMA ...` before using it?
+            job_store = SQLAlchemyJobStore(url=address, tablename=table, engine_options={"echo": self.SQLALCHEMY_ECHO})
+        elif address.startswith("crate://"):
+            job_store = CrateDBSQLAlchemyJobStore(url=address, tableschema=schema, tablename=table, engine_options={"echo": self.SQLALCHEMY_ECHO})
         else:
-            raise RuntimeError(f"Initializing job store failed. Unknown address: {self.settings.store_address}")
+            raise RuntimeError(f"Initializing job store failed. Unknown address: {address}")
 
         if self.settings.pre_delete_jobs:
             try:

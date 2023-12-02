@@ -1,7 +1,20 @@
+import dataclasses
+
 from pydantic import BaseModel, Field, validator
 from typing import Optional, Union
 from datetime import datetime
 import re
+
+
+@dataclasses.dataclass
+class JobStoreLocation:
+    """
+    Manage the triple of database address, schema name, and table name.
+    """
+    address: str
+    schema: str = "ext"
+    table: str = "jobs"
+
 
 class CronJob(BaseModel):
     id: int

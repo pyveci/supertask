@@ -47,7 +47,10 @@ pip install -r requirements.txt -r requirements-dev.txt
 Supertask obtains configuration settings from both command-line arguments,
 environment variables, and `.env` files. 
 
-Define job store address.
+It is required to define the job store address. For that, use either the
+`--store-address` command line option, or the `ST_STORE_ADDRESS` environment
+variable. The value is an SQLAlchemy-compatible connection URL.
+
 ```shell
 export ST_STORE_ADDRESS=memory://
 ```
@@ -57,6 +60,11 @@ export ST_STORE_ADDRESS=postgresql://postgres@localhost
 ```shell
 export ST_STORE_ADDRESS=crate://crate@localhost
 ```
+
+The default full qualified table name is `"ext"."jobs"`. It can be defined
+by using the `--store-schema-name` and `--store-table-name` command-line
+options, or by adjusting the `ST_STORE_SCHEMA_NAME` and `ST_STORE_TABLE_NAME`
+environment variables.
 
 
 ## Usage

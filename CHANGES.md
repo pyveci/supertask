@@ -17,3 +17,4 @@
 - Get rid of global `CRONJOBS_JSON` variable
 - Improve software tests and documentation
 - Settings: Obtain environment variables from `.env` file
+- Settings: Obtain job store schema- and table names alongside database address
