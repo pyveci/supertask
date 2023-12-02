@@ -1,5 +1,6 @@
 import dataclasses
 import re
+import typing as t
 from datetime import datetime
 from typing import Optional, Union
 
@@ -18,6 +19,10 @@ class JobStoreLocation:
 
 
 class CronJob(BaseModel):
+    """
+    Mediate between JSON file and HTTP API.
+    """
+
     id: int  # noqa: A003
     crontab: str
     job: str
@@ -31,3 +36,14 @@ class CronJob(BaseModel):
         if not re.match(pattern, v):
             raise ValueError("Invalid crontab syntax")
         return v
+
+
+@dataclasses.dataclass
+class Settings:
+    """
+    Bundle settings for propagating them from the environment to the FastAPI domain.
+    """
+
+    store_location: JobStoreLocation
+    pre_delete_jobs: bool
+    pre_seed_jobs: t.Optional[str]

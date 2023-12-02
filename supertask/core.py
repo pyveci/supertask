@@ -1,24 +1,20 @@
 import logging
 import os
-import threading
 import time
 import typing as t
 
 import icecream
 import pytz
-import uvicorn
 from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
-from fastapi import FastAPI
 from halo import Halo
 from icecream import ic
 
-from supertask.http.routes import router as cronjob_router
-from supertask.model import JobStoreLocation
-from supertask.settings import Settings
-from supertask.store.sqlalchemy import CrateDBSQLAlchemyJobStore
+from supertask.http.service import HTTPAPI
+from supertask.model import JobStoreLocation, Settings
+from supertask.store.cratedb import CrateDBSQLAlchemyJobStore
 
 logger = logging.getLogger(__name__)
 
@@ -126,21 +122,6 @@ class Supertask:
         return self
 
     def start_http_service(self, listen_http: str):
-        host, port_str = listen_http.split(":")
-        port = int(port_str)
-
-        logger.info(f"Starting HTTP service on: {host}:{port}")
-        app = FastAPI(debug=self.debug)
-
-        # Inject settings as dependency to FastAPI. Thanks, @Mause.
-        # https://github.com/tiangolo/fastapi/issues/2372#issuecomment-732492116
-        app.dependency_overrides[Settings] = lambda: self.settings
-
-        app.include_router(cronjob_router)
-
-        def run_server():
-            uvicorn.run(app, host=host, port=port)
-
-        server_thread = threading.Thread(target=run_server)
-        server_thread.start()
+        httpapi = HTTPAPI(settings=self.settings, listen_address=listen_http, debug=self.debug)
+        httpapi.start()
         return self

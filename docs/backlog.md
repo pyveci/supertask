@@ -4,6 +4,7 @@
 - Use regular logging instead of `icecream`
 - Format code
 - Are short-interval jobs possible?
+- Document that `--pre-seed-jobs` can access a wide range of remote resources
 - Release 0.1.0
 
 ## Iteration +2

@@ -1,15 +1,15 @@
 # ruff: noqa: B008
 import logging
 import typing as t
+from pathlib import Path
 
 import fastapi.responses
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from supertask.model import CronJob
+from supertask.model import CronJob, Settings
 from supertask.provision.database import JsonResource
-from supertask.settings import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,9 @@ def get_json_resource(settings: Settings = Depends()) -> JsonResource:
 @router.get("/", response_class=HTMLResponse)
 async def jobs_page(request: Request, json_resource: JsonResource = Depends(get_json_resource)):
     jobs = json_resource.read_index()
-    return templates.TemplateResponse("jobs.html", {"request": request, "jobs": jobs})
+    path = Path(__file__).parent / "templates"
+    tmpl = Jinja2Templates(path)
+    return tmpl.TemplateResponse("jobs.html", {"request": request, "jobs": jobs})
 
 
 @router.post("/cronjobs/", response_model=CronJob)

@@ -11,6 +11,74 @@ default-tag = "0.0.0"
 
 [project]
 name = "supertask"
+description = "Supertask, a convenience job scheduler"
+readme = "README.md"
+keywords = [
+  "apscheduler",
+  "cron",
+  "interval",
+  "jobs",
+  "scheduler",
+  "scheduling",
+  "tasks",
+  "toolkit",
+]
+license = { text = "AGPL 3, EUPL 1.2" }
+authors = [
+  { name = "Walter Behmann", email = "walter@crate.io" },
+  { name = "Andreas Motl", email = "andreas.motl@crate.io" },
+]
+requires-python = ">=3.8"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Customer Service",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Information Technology",
+  "Intended Audience :: Manufacturing",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: System Administrators",
+  "Intended Audience :: Telecommunications Industry",
+  "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
+  "License :: OSI Approved :: GNU Affero General Public License v3",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Unix",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Adaptive Technologies",
+  "Topic :: Communications",
+  "Topic :: Database",
+  "Topic :: Documentation",
+  "Topic :: Education",
+  "Topic :: Internet",
+  "Topic :: Internet :: WWW/HTTP",
+  "Topic :: Office/Business",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development :: Pre-processors",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+  "Topic :: Software Development :: Version Control",
+  "Topic :: System :: Archiving",
+  "Topic :: System :: Benchmark",
+  "Topic :: System :: Clustering",
+  "Topic :: System :: Distributed Computing",
+  "Topic :: System :: Logging",
+  "Topic :: System :: Monitoring",
+  "Topic :: System :: Networking",
+  "Topic :: System :: Systems Administration",
+  "Topic :: Text Processing",
+  "Topic :: Utilities",
+]
 dynamic = [
   "version",
 ]
