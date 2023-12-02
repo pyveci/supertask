@@ -60,4 +60,4 @@ def test_cli_http_service(mocker, st_wait_noop):
     )
     assert result.exit_code == 0
 
-    start_http_service_mock.assert_called_once_with('localhost:3333')
+    start_http_service_mock.assert_called_once_with("localhost:3333")

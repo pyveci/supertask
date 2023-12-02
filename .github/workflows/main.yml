@@ -78,13 +78,12 @@ jobs:
         pip install "setuptools>=64" --upgrade
 
         # Install package in editable mode.
-        # pip install --use-pep517 --prefer-binary --editable=.[test,develop]
-        pip install -r requirements.txt -r requirements-dev.txt
+        pip install --prefer-binary -r requirements.txt -r requirements-dev.txt
+        pip install --prefer-binary --editable=.[test,develop]
 
     - name: Run linter and software tests
       run: |
-        # poe check
-        poe test
+        poe check
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
