@@ -46,7 +46,7 @@ def test_read_cronjobs():
         },
         {
             "crontab": "* * * * *",
-            "enabled": False,
+            "enabled": True,
             "id": 1,
             "job": "job3",
             "last_run": None,

@@ -6,4 +6,5 @@ def test_my_job(mocker, capsys):
     mocker.patch("time.sleep")
     my_job("foo")
     out, err = capsys.readouterr()
-    assert "DONE" in err
+    assert "JOB-START" in err
+    assert "JOB-FINISH" in err
