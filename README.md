@@ -38,7 +38,8 @@ pinning is strongly recommended, especially when you use it as a library.
 ## Setup
 
 ```shell
-pip install -r requirements.txt -r requirements-dev.txt
+pip install --upgrade --prefer-binary -r requirements.txt -r requirements-dev.txt
+pip install --upgrade --prefer-binary --editable=.
 ```
 
 
@@ -101,7 +102,7 @@ documentation].
 
 [APScheduler]: https://pypi.org/project/APScheduler/
 [cron]: https://en.wikipedia.org/wiki/Cron
-[development sandbox documentation]: https://github.com/WalBeh/scheduler-playground/blob/main/docs/sandbox.md
+[development sandbox documentation]: https://github.com/WalBeh/scheduler-playground/blob/master/docs/sandbox.md
 [DWIM]: https://en.wikipedia.org/wiki/DWIM
 [FastAPI]: https://pypi.org/project/fastapi/
 [Pydantic]: https://pypi.org/project/pydantic/

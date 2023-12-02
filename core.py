@@ -1,23 +1,24 @@
 import logging
+import os
+import threading
+import time
+import typing as t
+
 import icecream
+import pytz
+import uvicorn
+from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
+from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.jobstores.memory import MemoryJobStore
-from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
-from icecream import ic
-import typing as t
-import time
-import uvicorn
-import os
-import pytz
-import threading
+from fastapi import FastAPI
 from halo import Halo
+from icecream import ic
 
+from cronjob_routes import router as cronjob_router
+from jobstore_sqlalchemy import CrateDBSQLAlchemyJobStore
 from models import JobStoreLocation
 from settings import Settings
-from jobstore_sqlalchemy import CrateDBSQLAlchemyJobStore
-from fastapi import FastAPI
-from cronjob_routes import router as cronjob_router
 
 logger = logging.getLogger(__name__)
 
@@ -25,11 +26,15 @@ icecream.IceCreamDebugger.lineWrapWidth = 120
 
 
 class Supertask:
-
     SQLALCHEMY_ECHO = False
 
-    def __init__(self, store: t.Union[JobStoreLocation, str], pre_delete_jobs: bool = False, pre_seed_jobs: str = None, debug: bool = False):
-
+    def __init__(
+        self,
+        store: t.Union[JobStoreLocation, str],
+        pre_delete_jobs: bool = False,
+        pre_seed_jobs: str = None,
+        debug: bool = False,
+    ):
         # Bundle settings to be able to propagate them to the FastAPI subsystem.
         if isinstance(store, str):
             store = JobStoreLocation(address=store)
@@ -58,36 +63,35 @@ class Supertask:
             # TODO: Need to run `CREATE SCHEMA ...` before using it?
             job_store = SQLAlchemyJobStore(url=address, tablename=table, engine_options={"echo": self.SQLALCHEMY_ECHO})
         elif address.startswith("crate://"):
-            job_store = CrateDBSQLAlchemyJobStore(url=address, tableschema=schema, tablename=table, engine_options={"echo": self.SQLALCHEMY_ECHO})
+            job_store = CrateDBSQLAlchemyJobStore(
+                url=address, tableschema=schema, tablename=table, engine_options={"echo": self.SQLALCHEMY_ECHO}
+            )
         else:
             raise RuntimeError(f"Initializing job store failed. Unknown address: {address}")
 
         if self.settings.pre_delete_jobs:
             try:
                 job_store.remove_all_jobs()
-            except:
+            except Exception:  # noqa: S110
                 pass
 
-        job_defaults = {
-            'coalesce': False,
-            'max_instances': 1
-        }
-        executors = {
-            'default': ThreadPoolExecutor(20),
-            'processpool': ProcessPoolExecutor(5)
-        }
+        job_defaults = {"coalesce": False, "max_instances": 1}
+        executors = {"default": ThreadPoolExecutor(20), "processpool": ProcessPoolExecutor(5)}
         job_stores = {
-            'default': job_store,
+            "default": job_store,
         }
 
         # Create a timezone object for Vienna
-        timezone = pytz.timezone('Europe/Vienna')
-        self.scheduler = BackgroundScheduler(executors=executors, job_defaults=job_defaults, jobstores=job_stores, timezone=timezone)
-        logger.info(f"Configured scheduler: "
-                    f"executors={self.scheduler._executors}, "
-                    f"jobstores={self.scheduler._jobstores}, "
-                    f"timezone={self.scheduler.timezone}"
-                    )
+        timezone = pytz.timezone("Europe/Vienna")
+        self.scheduler = BackgroundScheduler(
+            executors=executors, job_defaults=job_defaults, jobstores=job_stores, timezone=timezone
+        )
+        logger.info(
+            f"Configured scheduler: "
+            f"executors={self.scheduler._executors}, "
+            f"jobstores={self.scheduler._jobstores}, "
+            f"timezone={self.scheduler.timezone}"
+        )
         return self
 
     def start(self, listen_http: str = None):
@@ -100,7 +104,7 @@ class Supertask:
         logger.info("Starting scheduler")
         self.scheduler.start()
         start = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        ic('//======= START ======', start)
+        ic("//======= START ======", start)
 
         # Get next run time for all jobs
         jobs = self.scheduler.get_jobs()
@@ -109,8 +113,8 @@ class Supertask:
         return self
 
     def wait(self):
-        print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
-        spinner = Halo(text='Waiting', spinner='dots')
+        print("Press Ctrl+{0} to exit".format("Break" if os.name == "nt" else "C"))  # noqa: T201
+        spinner = Halo(text="Waiting", spinner="dots")
         spinner.start()
         try:
             # This is here to simulate application activity (which keeps the main thread alive).
@@ -122,7 +126,6 @@ class Supertask:
         return self
 
     def start_http_service(self, listen_http: str):
-
         host, port_str = listen_http.split(":")
         port = int(port_str)
 
@@ -134,7 +137,6 @@ class Supertask:
         app.dependency_overrides[Settings] = lambda: self.settings
 
         app.include_router(cronjob_router)
-        #app.include_router(cronjob_router, dependencies=[Depends(JsonResourceWithAddress(self.pre_seed_jobs))])
 
         def run_server():
             uvicorn.run(app, host=host, port=port)

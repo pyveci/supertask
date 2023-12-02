@@ -6,9 +6,8 @@ version = "0.0.0"
 py-modules = ["cli", "core", "cronjob_routes", "database", "job_seeder", "jobs", "jobstore_sqlalchemy", "models", "settings", "util"]
 
 [project.scripts]
-supertask = "cli:cli"
 st = "cli:cli"
-
+supertask = "cli:cli"
 [tool.black]
 line-length = 120
 
@@ -25,7 +24,7 @@ fail_under = 0
 show_missing = true
 
 [tool.mypy]
-packages = ["supertask"]
+packages = ["cli", "core", "cronjob_routes", "database", "job_seeder", "jobs", "jobstore_sqlalchemy", "models", "settings", "util"]
 exclude = [
 ]
 check_untyped_defs = true
@@ -120,14 +119,14 @@ format = [
   # Configure Ruff not to auto-fix (remove!):
   # unused imports (F401), unused variables (F841), `print` statements (T201), and commented-out code (ERA001).
   { cmd = "ruff --fix --ignore=ERA --ignore=F401 --ignore=F841 --ignore=T20 --ignore=ERA001 ." },
-  # { cmd = "pyproject-fmt pyproject.toml" },
+  { cmd = "pyproject-fmt pyproject.toml" },
 ]
 
 lint = [
   { cmd = "ruff ." },
   { cmd = "black --check ." },
-  # { cmd = "validate-pyproject pyproject.toml" },
-  # { cmd = "mypy" },
+  { cmd = "validate-pyproject pyproject.toml" },
+  { cmd = "mypy" },
 ]
 
 release = [
