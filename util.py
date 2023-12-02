@@ -4,7 +4,7 @@ import colorlog
 from colorlog.escape_codes import escape_codes
 
 
-def setup_logging(level=logging.INFO, verbose: bool = False, width: int = 36):
+def setup_logging(level=logging.INFO, debug: bool = False, width: int = 26):
     reset = escape_codes["reset"]
     log_format = f"%(asctime)-15s [%(name)-{width}s] %(log_color)s%(levelname)-8s:{reset} %(message)s"
 
@@ -14,7 +14,7 @@ def setup_logging(level=logging.INFO, verbose: bool = False, width: int = 36):
     logging.basicConfig(format=log_format, level=level, handlers=[handler])
 
     # Enable SQLAlchemy logging.
-    if verbose:
+    if debug:
         logging.getLogger("sqlalchemy").setLevel(level)
 
     logging.getLogger("crate.client").setLevel(level)

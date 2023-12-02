@@ -12,11 +12,10 @@ import pytz
 import threading
 from halo import Halo
 
-from job_seeder import JobSeeder
+from settings import Settings
 from jobstore_sqlalchemy import CrateDBSQLAlchemyJobStore
 from fastapi import FastAPI
 from cronjob_routes import router as cronjob_router
-from util import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +24,17 @@ icecream.IceCreamDebugger.lineWrapWidth = 120
 
 class Supertask:
 
-    def __init__(self, job_store_address: str, pre_delete_jobs: bool = False):
-        self.job_store_address = job_store_address
-        self.pre_delete_jobs = pre_delete_jobs
+    SQLALCHEMY_ECHO = False
+
+    def __init__(self, job_store_address: str, pre_delete_jobs: bool = False, pre_seed_jobs: str = None, debug: bool = False):
+
+        # Bundle settings to be able to propagate them to the FastAPI subsystem.
+        self.settings = Settings(
+            store_address=job_store_address,
+            pre_delete_jobs=pre_delete_jobs,
+            pre_seed_jobs=pre_seed_jobs,
+        )
+        self.debug = debug
         self.scheduler: BackgroundScheduler = None
         self.configure()
 
@@ -38,16 +45,16 @@ class Supertask:
         logger.info("Configuring scheduler")
 
         # Initialize a job store.
-        if self.job_store_address.startswith("memory://"):
+        if self.settings.store_address.startswith("memory://"):
             job_store = MemoryJobStore()
-        elif self.job_store_address.startswith("postgresql://"):
-            job_store = SQLAlchemyJobStore(url=self.job_store_address, engine_options={"echo": True})
-        elif self.job_store_address.startswith("crate://"):
-            job_store = CrateDBSQLAlchemyJobStore(url=self.job_store_address, engine_options={"echo": True})
+        elif self.settings.store_address.startswith("postgresql://"):
+            job_store = SQLAlchemyJobStore(url=self.settings.store_address, engine_options={"echo": self.SQLALCHEMY_ECHO})
+        elif self.settings.store_address.startswith("crate://"):
+            job_store = CrateDBSQLAlchemyJobStore(url=self.settings.store_address, engine_options={"echo": self.SQLALCHEMY_ECHO})
         else:
-            raise RuntimeError(f"Initializing job store failed. Unknown address: {self.job_store_address}")
+            raise RuntimeError(f"Initializing job store failed. Unknown address: {self.settings.store_address}")
 
-        if self.pre_delete_jobs:
+        if self.settings.pre_delete_jobs:
             try:
                 job_store.remove_all_jobs()
             except:
@@ -112,8 +119,14 @@ class Supertask:
         port = int(port_str)
 
         logger.info(f"Starting HTTP service on: {host}:{port}")
-        app = FastAPI()
+        app = FastAPI(debug=self.debug)
+
+        # Inject settings as dependency to FastAPI. Thanks, @Mause.
+        # https://github.com/tiangolo/fastapi/issues/2372#issuecomment-732492116
+        app.dependency_overrides[Settings] = lambda: self.settings
+
         app.include_router(cronjob_router)
+        #app.include_router(cronjob_router, dependencies=[Depends(JsonResourceWithAddress(self.pre_seed_jobs))])
 
         def run_server():
             uvicorn.run(app, host=host, port=port)

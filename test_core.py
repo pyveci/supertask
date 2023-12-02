@@ -20,18 +20,37 @@ def check_store(address: str):
         with engine.connect() as conn:
             conn.execute(sa.text("SELECT 1;"))
     except sa.exc.OperationalError as ex:
-        if "No more Servers available" in str(ex):
+        msg = str(ex)
+        if "No more Servers available" in msg or "Connection refused" in msg:
             raise pytest.skip(f"Skipping test case, because job store is not available: {address}") from ex
 
 
 @pytest.mark.parametrize(
     "job_store_address", ["memory://", "postgresql://postgres:postgres@localhost", "crate://crate@localhost"]
 )
-def test_supertask_stores_seeded(caplog, job_store_address):
+def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_file):
     check_store(job_store_address)
 
-    st = Supertask(job_store_address=job_store_address, pre_delete_jobs=True)
-    js = JobSeeder(scheduler=st.scheduler)
+    st = Supertask(job_store_address=job_store_address, pre_delete_jobs=True, pre_seed_jobs=cronjobs_json_file)
+    js = JobSeeder(source=cronjobs_json_file, scheduler=st.scheduler)
+    js.seed_jobs()
+    st.start()
+
+    assert "Configuring scheduler" in caplog.messages
+    assert "Seeding jobs" in caplog.messages
+    assert "Adding job tentatively -- it will be properly scheduled when the scheduler starts" in caplog.messages
+    assert "Starting scheduler" in caplog.messages
+    assert 'Added job "my_job" to job store "default"' in caplog.messages
+
+
+@pytest.mark.parametrize(
+    "job_store_address", ["memory://", "postgresql://postgres:postgres@localhost", "crate://crate@localhost"]
+)
+def test_supertask_stores_seeded_url(caplog, job_store_address, cronjobs_json_url):
+    check_store(job_store_address)
+
+    st = Supertask(job_store_address=job_store_address, pre_delete_jobs=True, pre_seed_jobs=cronjobs_json_url)
+    js = JobSeeder(source=cronjobs_json_url, scheduler=st.scheduler)
     js.seed_jobs()
     st.start()
 
