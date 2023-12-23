@@ -89,7 +89,7 @@ All together now.
 supertask \
   --http-listen-address=localhost:4243 \
   --pre-delete-jobs \
-  --pre-seed-jobs=https://github.com/WalBeh/scheduler-playground/raw/master/cronjobs.json
+  --pre-seed-jobs=https://github.com/pyveci/supertask/raw/main/cronjobs.json
 ```
 
 
@@ -101,7 +101,7 @@ documentation].
 
 [APScheduler]: https://pypi.org/project/APScheduler/
 [cron]: https://en.wikipedia.org/wiki/Cron
-[development sandbox documentation]: https://github.com/WalBeh/scheduler-playground/blob/master/docs/sandbox.md
+[development sandbox documentation]: https://github.com/pyveci/supertask/blob/master/docs/sandbox.md
 [DWIM]: https://en.wikipedia.org/wiki/DWIM
 [FastAPI]: https://pypi.org/project/fastapi/
 [Pydantic]: https://pypi.org/project/pydantic/

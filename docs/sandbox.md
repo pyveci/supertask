@@ -4,8 +4,8 @@
 
 Acquire sources.
 ```shell
-git clone https://github.com/WalBeh/scheduler-playground
-cd scheduler-playground
+git clone https://github.com/pyveci/supertask
+cd supertask
 ```
 
 It is recommended to use a Python virtualenv for the subsequent operations.

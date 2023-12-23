@@ -122,10 +122,10 @@ test = [
   "pytest-mock<4",
 ]
 [project.urls]
-changelog = "https://github.com/WalBeh/scheduler-playground/blob/master/CHANGES.rst"
-documentation = "https://github.com/WalBeh/scheduler-playground"
-homepage = "https://github.com/WalBeh/scheduler-playground"
-repository = "https://github.com/WalBeh/scheduler-playground"
+changelog = "https://github.com/pyveci/supertask/blob/main/CHANGES.md"
+documentation = "https://github.com/pyveci/supertask"
+homepage = "https://github.com/pyveci/supertask"
+repository = "https://github.com/pyveci/supertask"
 [project.scripts]
 st = "supertask.cli:cli"
 supertask = "supertask.cli:cli"
