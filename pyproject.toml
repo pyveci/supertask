@@ -97,7 +97,7 @@ dependencies = [
   "pydantic<3",
   "python-dotenv[cli]<2",
   "python-multipart==0.0.6",
-  "uvicorn<0.25",
+  "uvicorn<0.26",
   "watchdog<4",
 ]
 [project.optional-dependencies]
