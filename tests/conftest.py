@@ -20,4 +20,4 @@ def cronjobs_json_file() -> str:
 
 @pytest.fixture(scope="session")
 def cronjobs_json_url() -> str:
-    return "https://github.com/WalBeh/scheduler-playground/raw/master/cronjobs.json"
+    return "https://github.com/pyveci/supertask/raw/main/cronjobs.json"
