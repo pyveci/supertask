@@ -5,6 +5,7 @@
 - Format code
 - Are short-interval jobs possible?
 - Document that `--pre-seed-jobs` can access a wide range of remote resources
+- Check out https://pypi.org/project/fastapi-apscheduler/
 - Release 0.1.0
 
 ## Iteration +2
@@ -17,6 +18,9 @@
   ERROR:    [Errno 8] nodename nor servname provided, or not known
   ```
 - Check out FastUI. -- https://github.com/samuelcolvin/FastUI
+- APScheduler UIs
+  - https://github.com/schmidtfederico/apscheduler-ui
+  - https://gitee.com/huge-dream/dvadmin-apscheduler
 - Isolate testing from workstation use:
   ```
   Unable to restore job "foo" -- removing it
