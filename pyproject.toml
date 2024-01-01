@@ -88,7 +88,7 @@ dependencies = [
   "colorama<0.5",
   "colorlog<7",
   "crate[sqlalchemy]",
-  "fastapi<0.106",
+  "fastapi<0.109",
   "halo<0.1",
   "icecream<3",
   "Jinja2<4",
