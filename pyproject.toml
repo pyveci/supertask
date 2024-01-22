@@ -114,7 +114,7 @@ release = [
   "twine<5",
 ]
 test = [
-  "cratedb-toolkit==0.0.2",
+  "cratedb-toolkit==0.0.3",
   "httpx<0.27",
   "psycopg2-binary<3",
   "pytest<8",
