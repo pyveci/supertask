@@ -6,3 +6,4 @@ __pycache__
 .coverage*
 coverage.xml
 *.egg-info
+.mypy_cache
