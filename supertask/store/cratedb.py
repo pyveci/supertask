@@ -5,7 +5,6 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 
 
 class LargeBinary(sa.String):
-
     """A type for large binary byte data.
 
     The :class:`.LargeBinary` type corresponds to a large and/or unlengthed
