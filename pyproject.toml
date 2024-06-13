@@ -92,7 +92,7 @@ dependencies = [
   "icecream<3",
   "Jinja2<4",
   "MarkupSafe<3",
-  "pueblo[fileio]@ git+https://github.com/pyveci/pueblo@main",
+  "pueblo[fileio]",
   "pydantic<3",
   "python-dotenv[cli]<2",
   "python-multipart==0.0.9",
