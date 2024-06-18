@@ -18,4 +18,5 @@ def setup_logging(level=logging.INFO, debug: bool = False, width: int = 30):
         logging.getLogger("sqlalchemy").setLevel(level)
 
     logging.getLogger("crate.client").setLevel(level)
+    logging.getLogger("sqlalchemy_cratedb").setLevel(level)
     logging.getLogger("urllib3.connectionpool").setLevel(level)

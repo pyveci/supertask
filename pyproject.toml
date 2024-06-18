@@ -96,7 +96,7 @@ dependencies = [
   "pydantic<3",
   "python-dotenv[cli]<2",
   "python-multipart==0.0.9",
-  "sqlalchemy-cratedb",
+  "sqlalchemy-cratedb==0.37.0",
   "uvicorn<0.31",
   "watchdog<5",
 ]
@@ -114,7 +114,7 @@ release = [
   "twine<6",
 ]
 test = [
-  "cratedb-toolkit==0.0.12",
+  "cratedb-toolkit==0.0.14",
   "httpx<0.28",
   "psycopg2-binary<3",
   "pytest<9",
