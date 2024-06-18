@@ -65,10 +65,9 @@ class CrateDBSQLAlchemyJobStore(SQLAlchemyJobStore):
         """
         A few patches to make the CrateDB SQLAlchemy dialect work.
 
-        TODO: Upstream to crate-python.
         """
-        from crate.client.sqlalchemy import CrateDialect
-        from crate.client.sqlalchemy.compiler import CrateDDLCompiler, CrateTypeCompiler
+        from sqlalchemy_cratedb import dialect
+        from sqlalchemy_cratedb.compiler import CrateDDLCompiler, CrateTypeCompiler
 
         def visit_BLOB(self, type_, **kw):
             return "STRING"
@@ -102,7 +101,7 @@ class CrateDBSQLAlchemyJobStore(SQLAlchemyJobStore):
 
         CrateDDLCompiler.visit_create_index = visit_create_index
 
-        CrateDialect.colspecs.update(
+        dialect.colspecs.update(
             {
                 sa.sql.sqltypes.LargeBinary: LargeBinary,
             }
