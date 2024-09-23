@@ -87,7 +87,7 @@ dependencies = [
   "click<9",
   "colorama<0.5",
   "colorlog<7",
-  "fastapi<0.112",
+  "fastapi<0.116",
   "halo<0.1",
   "icecream<3",
   "Jinja2<4",
