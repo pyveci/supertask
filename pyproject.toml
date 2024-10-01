@@ -5,10 +5,6 @@ requires = [
   "versioningit",
 ]
 
-[tool.versioningit.vcs]
-method = "git"
-default-tag = "0.0.0"
-
 [project]
 name = "supertask"
 description = "Supertask, a convenience job scheduler"
@@ -83,15 +79,15 @@ dynamic = [
   "version",
 ]
 dependencies = [
-  "APScheduler<4",
+  "apscheduler<4",
   "click<9",
   "colorama<0.5",
   "colorlog<7",
   "fastapi<0.112",
   "halo<0.1",
   "icecream<3",
-  "Jinja2<4",
-  "MarkupSafe<3",
+  "jinja2<4",
+  "markupsafe<3",
   "pueblo[fileio]",
   "pydantic<3",
   "python-dotenv[cli]<2",
@@ -100,8 +96,7 @@ dependencies = [
   "uvicorn<0.31",
   "watchdog<5",
 ]
-[project.optional-dependencies]
-develop = [
+optional-dependencies.develop = [
   "black<25",
   "mypy<1.12",
   "poethepoet<0.28",
@@ -109,11 +104,11 @@ develop = [
   "ruff<0.7",
   "validate-pyproject<0.19",
 ]
-release = [
+optional-dependencies.release = [
   "build<2",
   "twine<6",
 ]
-test = [
+optional-dependencies.test = [
   "cratedb-toolkit==0.0.15",
   "httpx<0.28",
   "psycopg2-binary<3",
@@ -121,41 +116,69 @@ test = [
   "pytest-cov<6",
   "pytest-mock<4",
 ]
-[project.urls]
-changelog = "https://github.com/pyveci/supertask/blob/main/CHANGES.md"
-documentation = "https://github.com/pyveci/supertask"
-homepage = "https://github.com/pyveci/supertask"
-repository = "https://github.com/pyveci/supertask"
-[project.scripts]
-st = "supertask.cli:cli"
-supertask = "supertask.cli:cli"
+urls.changelog = "https://github.com/pyveci/supertask/blob/main/CHANGES.md"
+urls.documentation = "https://github.com/pyveci/supertask"
+urls.homepage = "https://github.com/pyveci/supertask"
+urls.repository = "https://github.com/pyveci/supertask"
+scripts.st = "supertask.cli:cli"
+scripts.supertask = "supertask.cli:cli"
+
+[tool.setuptools]
+packages = [ "supertask" ]
 
 [tool.black]
 line-length = 120
 
-[tool.setuptools]
-packages = ["supertask"]
+[tool.ruff]
+line-length = 120
 
-[tool.coverage.run]
-branch = false
-omit = [
-  "tests/*",
-  "test_*.py",
+extend-exclude = [
 ]
-source = ["supertask"]
 
-[tool.coverage.report]
-fail_under = 0
-show_missing = true
+lint.select = [
+  # Builtins
+  "A",
+  # Bugbear
+  "B",
+  # comprehensions
+  "C4",
+  # Pycodestyle
+  "E",
+  # eradicate
+  "ERA",
+  # Pyflakes
+  "F",
+  # isort
+  "I",
+  # pandas-vet
+  "PD",
+  # return
+  "RET",
+  # Bandit
+  "S",
+  # print
+  "T20",
+  "W",
+  # flake8-2020
+  "YTT",
+]
 
-[tool.mypy]
-packages = ["supertask"]
-exclude = []
-check_untyped_defs = true
-ignore_missing_imports = true
-implicit_optional = true
-install_types = true
-non_interactive = true
+lint.extend-ignore = [
+  # zip() without an explicit strict= parameter
+  "B905",
+  # df is a bad variable name. Be kinder to your future self.
+  "PD901",
+  # Unnecessary variable assignment before `return` statement
+  "RET504",
+  # Unnecessary `elif` after `return` statement
+  "RET505",
+  # Probable insecure usage of temporary file or directory
+  "S108",
+]
+
+lint.per-file-ignores."examples/*" = [ "T201" ] # Allow `print`
+lint.per-file-ignores."test_*.py" = [ "S101" ]  # Allow use of `assert`, and `print`.
+lint.per-file-ignores."tests/*" = [ "S101" ]    # Allow use of `assert`, and `print`.
 
 [tool.pytest.ini_options]
 addopts = """
@@ -173,59 +196,30 @@ xfail_strict = true
 markers = [
 ]
 
-[tool.ruff]
-line-length = 120
-
-lint.select = [
-  # Bandit
-  "S",
-  # Bugbear
-  "B",
-  # Builtins
-  "A",
-  # comprehensions
-  "C4",
-  # eradicate
-  "ERA",
-  # flake8-2020
-  "YTT",
-  # isort
-  "I",
-  # pandas-vet
-  "PD",
-  # print
-  "T20",
-  # Pycodestyle
-  "E",
-  "W",
-  # Pyflakes
-  "F",
-  # return
-  "RET",
+[tool.coverage.run]
+branch = false
+omit = [
+  "tests/*",
+  "test_*.py",
 ]
+source = [ "supertask" ]
 
-lint.extend-ignore = [
-  # zip() without an explicit strict= parameter
-  "B905",
-  # df is a bad variable name. Be kinder to your future self.
-  "PD901",
-  # Unnecessary variable assignment before `return` statement
-  "RET504",
-  # Unnecessary `elif` after `return` statement
-  "RET505",
-  # Probable insecure usage of temporary file or directory
-  "S108",
-]
+[tool.coverage.report]
+fail_under = 0
+show_missing = true
 
-extend-exclude = [
-]
+[tool.mypy]
+packages = [ "supertask" ]
+exclude = [  ]
+check_untyped_defs = true
+ignore_missing_imports = true
+implicit_optional = true
+install_types = true
+non_interactive = true
 
-[tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101"]  # Allow use of `assert`, and `print`.
-"test_*.py" = ["S101"]  # Allow use of `assert`, and `print`.
-"examples/*" = ["T201"]  # Allow `print`
-
-
+[tool.versioningit.vcs]
+method = "git"
+default-tag = "0.0.0"
 
 # ===================
 # Tasks configuration
