@@ -93,7 +93,7 @@ dependencies = [
   "python-dotenv[cli]<2",
   "python-multipart==0.0.12",
   "sqlalchemy-cratedb==0.38.0",
-  "uvicorn<0.31",
+  "uvicorn<0.32",
   "watchdog<5",
 ]
 optional-dependencies.develop = [
