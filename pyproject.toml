@@ -91,7 +91,7 @@ dependencies = [
   "pueblo[fileio]",
   "pydantic<3",
   "python-dotenv[cli]<2",
-  "python-multipart==0.0.9",
+  "python-multipart==0.0.12",
   "sqlalchemy-cratedb==0.38.0",
   "uvicorn<0.31",
   "watchdog<5",
