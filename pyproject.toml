@@ -92,7 +92,7 @@ dependencies = [
   "pydantic<3",
   "python-dotenv[cli]<2",
   "python-multipart==0.0.12",
-  "sqlalchemy-cratedb==0.38.0",
+  "sqlalchemy-cratedb==0.40.0",
   "uvicorn<0.32",
   "watchdog<5",
 ]
