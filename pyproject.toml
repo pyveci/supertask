@@ -87,7 +87,7 @@ dependencies = [
   "halo<0.1",
   "icecream<3",
   "jinja2<4",
-  "markupsafe<3",
+  "markupsafe<4",
   "pueblo[fileio]",
   "pydantic<3",
   "python-dotenv[cli]<2",
