@@ -94,7 +94,7 @@ dependencies = [
   "python-multipart==0.0.16",
   "sqlalchemy-cratedb==0.40.0",
   "uvicorn<0.33",
-  "watchdog<6",
+  "watchdog<7",
 ]
 optional-dependencies.develop = [
   "black<25",
