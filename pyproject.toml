@@ -95,7 +95,7 @@ dependencies = [
   "pytz",
   "sqlalchemy-cratedb==0.40.0",
   "uvicorn<0.33",
-  "watchdog<6",
+  "watchdog<7",
 ]
 optional-dependencies.develop = [
   "black<25",
