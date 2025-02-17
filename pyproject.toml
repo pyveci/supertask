@@ -98,7 +98,7 @@ dependencies = [
   "watchdog<7",
 ]
 optional-dependencies.develop = [
-  "black<25",
+  "black<26",
   "mypy<1.14",
   "poethepoet<0.32",
   "pyproject-fmt<2.6",
