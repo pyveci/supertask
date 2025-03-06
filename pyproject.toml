@@ -98,7 +98,6 @@ dependencies = [
   "watchdog<7",
 ]
 optional-dependencies.develop = [
-  "black<25",
   "mypy<1.14",
   "poethepoet<1",
   "pyproject-fmt<2.6",
@@ -126,9 +125,6 @@ scripts.supertask = "supertask.cli:cli"
 
 [tool.setuptools]
 packages = [ "supertask" ]
-
-[tool.black]
-line-length = 120
 
 [tool.ruff]
 line-length = 120
@@ -234,7 +230,7 @@ check = [
 ]
 
 format = [
-  { cmd = "black ." },
+  { cmd = "ruff format ." },
   # Configure Ruff not to auto-fix (remove!):
   # unused imports (F401), unused variables (F841), `print` statements (T201), and commented-out code (ERA001).
   { cmd = "ruff check --fix --ignore=ERA --ignore=F401 --ignore=F841 --ignore=T20 --ignore=ERA001 ." },
@@ -242,8 +238,8 @@ format = [
 ]
 
 lint = [
+  { cmd = "ruff format --check ." },
   { cmd = "ruff check ." },
-  { cmd = "black --check ." },
   { cmd = "validate-pyproject pyproject.toml" },
   { cmd = "mypy" },
 ]
