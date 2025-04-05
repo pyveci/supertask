@@ -27,7 +27,7 @@ def check_store(address: str):
 
 
 @pytest.mark.parametrize(
-    "job_store_address", ["memory://", "postgresql://postgres:postgres@localhost", "crate://crate@localhost"]
+    "job_store_address", ["memory://", "postgresql://postgres:postgres@localhost:5433", "crate://crate@localhost"]
 )
 def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_file):
     check_store(job_store_address)
@@ -45,7 +45,7 @@ def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_f
 
 
 @pytest.mark.parametrize(
-    "job_store_address", ["memory://", "postgresql://postgres:postgres@localhost", "crate://crate@localhost"]
+    "job_store_address", ["memory://", "postgresql://postgres:postgres@localhost:5433", "crate://crate@localhost"]
 )
 def test_supertask_stores_seeded_url(caplog, job_store_address, cronjobs_json_url):
     check_store(job_store_address)
