@@ -23,13 +23,17 @@ pip install --editable=.
 
 Start service containers needed for running the test suite completely.
 ```shell
-docker run --rm -it --name=cratedb --publish=4200:4200 \
-  --env=CRATE_HEAP_SIZE=4g crate/crate:nightly \
+docker run --rm -it --name=cratedb \
+  --publish=4200:4200 --publish=5432:5432 \
+  --env=CRATE_HEAP_SIZE=2g \
+  crate/crate:nightly \
   -Cdiscovery.type=single-node
 ```
 ```shell
-docker run --rm -it --name=postgresql --publish=5432:5432 \
-  --env "POSTGRES_HOST_AUTH_METHOD=trust" postgres:15 postgres -c log_statement=all
+docker run --rm -it --name=postgresql \
+  --publish=5433:5432 \
+  --env "POSTGRES_HOST_AUTH_METHOD=trust" \
+  postgres:17 postgres -c log_statement=all
 ```
 
 Run linters and software tests.
