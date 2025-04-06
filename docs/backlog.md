@@ -2,14 +2,19 @@
 
 ## Iteration +1
 - Use regular logging instead of `icecream`
-- Format code
-- Are short-interval jobs possible?
-- Document that `--pre-seed-jobs` can access a wide range of remote resources
-- Check out https://pypi.org/project/fastapi-apscheduler/
-- Release 0.1.0
+- Refactor data model
+- Release v0.0.1
+- Provide other schedules than `cron`
+- Launch command-line targets, using `uv`
+- Documentation: `--pre-seed-jobs` can access a wide range of remote resources
+- Project scaffolding
+- Release v0.0.2
 
 ## Iteration +2
+- HTTP API: Updating jobs does not work
+- Check out https://pypi.org/project/fastapi-apscheduler/
 - Add `JobExecution` subsystem derived from `django-apscheduler`
+- Can Supertask provide its services per MCP server?
 - Wrapper around Job execution
 - Success / failure notifications
 - SDK interface, with examples
@@ -32,3 +37,5 @@
 - Config: Obtain HTTP listen address
 - Config: Obtain path/URL to seed file per CLI argument `--seed=cronjobs.json`
 - Config: Obtain job store schema- and table names alongside database address
+- Format code
+- Are short-interval jobs possible? Yes, down to seconds-granularity.

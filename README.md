@@ -65,8 +65,9 @@ by using the `--store-schema-name` and `--store-table-name` command-line
 options, or by adjusting the `ST_STORE_SCHEMA_NAME` and `ST_STORE_TABLE_NAME`
 environment variables.
 
+## Handbook
 
-## Usage
+### Usage
 
 Run scheduler daemon, with pre-seeded example jobs.
 ```shell
@@ -91,6 +92,30 @@ supertask \
   --pre-seed-jobs=https://github.com/pyveci/supertask/raw/main/cronjobs.json
 ```
 
+### Extended crontab syntax
+
+Traditional Unix Cron uses just 5 components to define schedules, like
+`minute, hour, day (month), month, day (week)`.
+```
+# Every minute.
+* * * * *
+
+# Every 10 minutes.
+*/10 * * * *
+```
+-- https://crontab.guru/every-minute
+-- https://crontab.guru/every-ten-minutes
+
+On the other hand, APScheduler provides an extended 6- or 7-tuple syntax,
+adding an optional scheduling unit for **seconds** on the left hand side, and
+another one for scheduling **years** on the right hand side, like
+`second (0-59), minute (0-59), hour (0-23), day of month (1-31), month
+(1-12), day of week (0-6)`.
+```
+# Every 10 seconds, starting 2026.
+*/10 * * * * * 2026
+```
+-- https://crontabkit.com/crontab-every-10-seconds
 
 ## Development
 

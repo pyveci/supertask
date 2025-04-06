@@ -40,13 +40,13 @@ async def jobs_page(request: Request, json_resource: JsonResource = Depends(get_
 
 @router.post("/cronjobs/", response_model=CronJob)
 def create_cronjob(
+    name: str = Form(...),
     crontab: str = Form(...),
-    job: str = Form(...),
     enabled: bool = Form(False),
     json_resource: JsonResource = Depends(get_json_resource),
 ):
     db = json_resource.read()
-    cronjob = CronJob(id=len(db) + 1, crontab=crontab, job=job, enabled=enabled, last_run=None, last_status=None)
+    cronjob = CronJob(id=len(db) + 1, name=name, trigger_cron=crontab, enabled=enabled, last_run=None, last_status=None)
     db.append(cronjob)
     json_resource.write(db)
     return cronjob

@@ -18,3 +18,4 @@
 - Settings: Obtain job store schema- and table names alongside database address
 - Packaging / Refactoring
 - Dropped support for Python 3.8
+- Refactored scheduling and rescheduling, improved data model
