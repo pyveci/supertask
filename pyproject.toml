@@ -19,7 +19,8 @@ keywords = [
   "tasks",
   "toolkit",
 ]
-license = { text = "AGPL 3, EUPL 1.2" }
+license = "AGPL-3.0-or-later"
+license-files = [ "LICENSE" ]
 authors = [
   { name = "Walter Behmann", email = "walter@crate.io" },
   { name = "Andreas Motl", email = "andreas.motl@crate.io" },
@@ -37,8 +38,6 @@ classifiers = [
   "Intended Audience :: Science/Research",
   "Intended Audience :: System Administrators",
   "Intended Audience :: Telecommunications Industry",
-  "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
-  "License :: OSI Approved :: GNU Affero General Public License v3",
   "Operating System :: MacOS :: MacOS X",
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX :: Linux",
@@ -124,8 +123,10 @@ urls.repository = "https://github.com/pyveci/supertask"
 scripts.st = "supertask.cli:cli"
 scripts.supertask = "supertask.cli:cli"
 
-[tool.setuptools]
-packages = [ "supertask" ]
+[tool.setuptools.packages.find]
+where = [ "." ]
+include = [ "supertask*" ]
+namespaces = false
 
 [tool.ruff]
 line-length = 120
