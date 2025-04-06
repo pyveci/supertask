@@ -32,6 +32,7 @@ jobs:
     env:
       OS: ${{ matrix.os }}
       PYTHON: ${{ matrix.python-version }}
+      UV_SYSTEM_PYTHON: true
 
     # https://docs.github.com/en/actions/using-containerized-services/about-service-containers
     services:
@@ -60,24 +61,24 @@ jobs:
     - name: Acquire sources
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Install Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        architecture: x64
-        cache: 'pip'
-        cache-dependency-path:
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        cache-dependency-glob: |
           pyproject.toml
+        cache-suffix: ${{ matrix.python-version }}
+        enable-cache: true
+        version: "latest"
 
-    - name: Set up project
+    - name: Install project
       run: |
-
-        # `setuptools 0.64.0` adds support for editable install hooks (PEP 660).
-        # https://github.com/pypa/setuptools/blob/main/CHANGES.rst#v6400
-        pip install "setuptools>=64" --upgrade
-
         # Install package in editable mode.
-        pip install --prefer-binary --editable=.[test,develop]
+        uv pip install --editable='.[test,develop]'
 
     - name: Run linter and software tests
       run: |
