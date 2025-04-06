@@ -1,8 +1,6 @@
 # Supertask Changelog
 
-
 ## Unreleased
-
 - Make it work
 - Add documentation
 - Add FastAPI endpoint
@@ -19,3 +17,4 @@
 - Settings: Obtain environment variables from `.env` file
 - Settings: Obtain job store schema- and table names alongside database address
 - Packaging / Refactoring
+- Dropped support for Python 3.8
