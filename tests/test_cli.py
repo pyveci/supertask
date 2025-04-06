@@ -11,6 +11,19 @@ def st_wait_noop(mocker):
     mocker.patch("supertask.core.Supertask.wait")
 
 
+def test_cli_version(st_wait_noop):
+    runner = CliRunner()
+
+    result = runner.invoke(
+        cli,
+        args="--version",
+        catch_exceptions=False,
+    )
+    assert result.exit_code == 0
+
+    assert "cli, version" in result.output
+
+
 def test_cli_help(st_wait_noop):
     runner = CliRunner()
 
