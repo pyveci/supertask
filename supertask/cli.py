@@ -33,6 +33,7 @@ load_dotenv(find_dotenv())
 )
 @click.option("--verbose", is_flag=True, required=False, default=True, help="Turn logging on/off")
 @click.option("--debug", is_flag=True, required=False, help="Turn on logging with debug level")
+@click.version_option()
 @click.pass_context
 def cli(
     ctx: click.Context,
