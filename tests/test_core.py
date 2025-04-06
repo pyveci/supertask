@@ -27,7 +27,8 @@ def check_store(address: str):
 
 
 @pytest.mark.parametrize(
-    "job_store_address", ["memory://", "postgresql://postgres:postgres@localhost:5433", "crate://crate@localhost"]
+    "job_store_address",
+    ["memory://", "postgresql://postgres:postgres@localhost:5433", "crate://crate@localhost/?schema=testdrive"],
 )
 def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_file):
     check_store(job_store_address)
@@ -46,7 +47,8 @@ def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_f
 
 @pytest.mark.skip(reason="Does not work when job representation changes")
 @pytest.mark.parametrize(
-    "job_store_address", ["memory://", "postgresql://postgres:postgres@localhost:5433", "crate://crate@localhost"]
+    "job_store_address",
+    ["memory://", "postgresql://postgres:postgres@localhost:5433", "crate://crate@localhost/?schema=testdrive"],
 )
 def test_supertask_stores_seeded_url(caplog, job_store_address, cronjobs_json_url):
     check_store(job_store_address)
@@ -71,7 +73,7 @@ def test_supertask_cratedb_store(caplog):
     # Create a job using Supertask.
     job_store_address = "crate://crate@localhost/"
     check_store(job_store_address)
-    st = Supertask(JobStoreLocation(address=job_store_address), pre_delete_jobs=True)
+    st = Supertask(JobStoreLocation(address=job_store_address, schema="testdrive"), pre_delete_jobs=True)
     reference_time = dt.datetime(year=8022, month=1, day=1, tzinfo=dt.timezone.utc)
     st.scheduler.add_job(
         dummy_job, args=["something"], trigger="interval", id="foo", name="bar", next_run_time=reference_time
@@ -80,9 +82,9 @@ def test_supertask_cratedb_store(caplog):
 
     # Verify the job has been stored into CrateDB.
     cratedb = DatabaseAdapter(dburi=job_store_address)
-    assert cratedb.table_exists("ext.jobs")
-    assert cratedb.count_records("ext.jobs") == 1
-    assert cratedb.run_sql("SELECT * FROM ext.jobs", records=True) == [
+    assert cratedb.table_exists("testdrive.jobs")
+    assert cratedb.count_records("testdrive.jobs") == 1
+    assert cratedb.run_sql("SELECT * FROM testdrive.jobs", records=True) == [
         {"id": "foo", "job_state": mock.ANY, "next_run_time": reference_time.timestamp()}
     ]
 
@@ -93,7 +95,7 @@ def test_supertask_cratedb_custom_schema_and_table(caplog):
     check_store(job_store_address)
     store_location = JobStoreLocation(
         address=job_store_address,
-        schema="foo",
+        schema="testdrive",
         table="bar",
     )
     st = Supertask(store_location, pre_delete_jobs=True)
@@ -105,9 +107,9 @@ def test_supertask_cratedb_custom_schema_and_table(caplog):
 
     # Verify the job has been stored into CrateDB.
     cratedb = DatabaseAdapter(dburi=job_store_address)
-    assert cratedb.table_exists("foo.bar")
-    assert cratedb.count_records("foo.bar") == 1
-    assert cratedb.run_sql("SELECT * FROM foo.bar", records=True) == [
+    assert cratedb.table_exists("testdrive.bar")
+    assert cratedb.count_records("testdrive.bar") == 1
+    assert cratedb.run_sql("SELECT * FROM testdrive.bar", records=True) == [
         {"id": "foo", "job_state": mock.ANY, "next_run_time": reference_time.timestamp()}
     ]
 
