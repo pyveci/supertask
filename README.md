@@ -1,6 +1,5 @@
 # Supertask
 
-
 ## About
 
 Supertask is a convenience job scheduler based on [APScheduler], [FastAPI],
@@ -13,16 +12,14 @@ library.
 It aims for [DWIM]-like usefulness and [UX], and provides CLI and HTTP
 interfaces, and others.
 
-
 ## Features
 
 - Store jobs in databases supported by SQLAlchemy.
 - HTTP API to manipulate the job data model.
 - Optionally, jobs can be pre-seeded from a JSON file `config.json`, either
-  from the local filesystem, or from a remote URL. When using the filesystem,
-  a watchdog monitors the file for changes, in order to keep the crontabs
-  up-to-date.
-
+  from the local filesystem, or from a wide range of remote locations.
+  When using the filesystem, a watchdog monitors the file for changes, in
+  order to keep the schedules up to date.
 
 ## Status
 
@@ -33,13 +30,11 @@ in order to make it more solid, and to add features.
 Breaking changes should be expected until a 1.0 release, so version
 pinning is strongly recommended, especially when you use it as a library.
 
-
 ## Setup
 
 ```shell
 uv run --with='supertask @ git+https://github.com/pyveci/supertask.git' supertask --version
 ```
-
 
 ## Configuration
 
@@ -60,7 +55,7 @@ export ST_STORE_ADDRESS=postgresql://postgres@localhost
 export ST_STORE_ADDRESS=crate://crate@localhost
 ```
 
-The default full qualified table name is `"ext"."jobs"`. It can be defined
+The default full qualified table name is `"supertask"."jobs"`. It can be defined
 by using the `--store-schema-name` and `--store-table-name` command-line
 options, or by adjusting the `ST_STORE_SCHEMA_NAME` and `ST_STORE_TABLE_NAME`
 environment variables.

@@ -14,7 +14,7 @@ class JobStoreLocation:
     """
 
     address: str
-    schema: str = "ext"
+    schema: str = "supertask"
     table: str = "jobs"
 
 
