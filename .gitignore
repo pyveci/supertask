@@ -1,6 +1,7 @@
 .env
 .idea
 .venv*
+dist
 venv
 __pycache__
 .coverage*
