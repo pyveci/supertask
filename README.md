@@ -1,7 +1,5 @@
 # Supertask
 
-## About
-
 Supertask is a convenience job scheduler based on [APScheduler], [FastAPI],
 [Pydantic], [SQLAlchemy], and a few other excellent packages.
 
@@ -9,8 +7,26 @@ You can use Supertask to invoke time-driven actions like the venerable [cron]
 daemon is doing it. It can be used both as a standalone program, and as a
 library.
 
-It aims for [DWIM]-like usefulness and [UX], and provides CLI and HTTP
-interfaces, and others.
+Supertask aims for [DWIM]-like usefulness and [UX], and provides CLI-, HTTP-,
+and other interfaces.
+
+» [Documentation]
+| [Changelog]
+| [PyPI]
+| [Issues]
+| [Source code]
+| [License]
+| [Community Forum]
+
+[![CI][badge-ci]][project-ci]
+[![Coverage][badge-coverage]][project-coverage]
+[![Downloads per month][badge-downloads-per-month]][project-downloads]
+[![License][badge-license]][project-license]
+
+[![Release Notes][badge-release-notes]][project-release-notes]
+[![Package version][badge-package-version]][project-pypi]
+[![Status][badge-status]][project-pypi]
+[![Supported Python versions][badge-python-versions]][project-pypi]
 
 ## Features
 
@@ -27,102 +43,53 @@ Please note that Supertask is a work in progress, and to be considered
 alpha-quality software. Contributions of all kinds are much welcome,
 in order to make it more solid, and to add features.
 
-Breaking changes should be expected until a 1.0 release, so version
-pinning is strongly recommended, especially when you use it as a library.
+Breaking changes should be expected until a 1.0 release, so applying
+version pinning is strongly recommended when consuming the packages.
 
-## Setup
+## Installation
 
-```shell
-uv run --with='supertask @ git+https://github.com/pyveci/supertask.git' supertask --version
-```
+See [Supertask Installation].
 
-## Configuration
+## Usage
 
-Supertask obtains configuration settings from both command-line arguments,
-environment variables, and `.env` files. 
+See [Supertask Handbook].
 
-It is required to define the job store address. For that, use either the
-`--store-address` command line option, or the `ST_STORE_ADDRESS` environment
-variable. The value is an SQLAlchemy-compatible connection URL.
+## Contribute
 
-```shell
-export ST_STORE_ADDRESS=memory://
-```
-```shell
-export ST_STORE_ADDRESS=postgresql://postgres@localhost
-```
-```shell
-export ST_STORE_ADDRESS=crate://crate@localhost
-```
+See [Supertask Sandbox].
 
-The default full qualified table name is `"supertask"."jobs"`. It can be defined
-by using the `--store-schema-name` and `--store-table-name` command-line
-options, or by adjusting the `ST_STORE_SCHEMA_NAME` and `ST_STORE_TABLE_NAME`
-environment variables.
-
-## Handbook
-
-### Usage
-
-Run scheduler daemon, with pre-seeded example jobs.
-```shell
-supertask --pre-delete-jobs --pre-seed-jobs=cronjobs.json
-```
-
-Run scheduler daemon, and start HTTP API service.
-```shell
-supertask --http-listen-address=localhost:4243
-```
-
-Consume HTTP API.
-```shell
-http http://localhost:4243/cronjobs/
-```
-
-All together now.
-```shell
-supertask \
-  --http-listen-address=localhost:4243 \
-  --pre-delete-jobs \
-  --pre-seed-jobs=https://github.com/pyveci/supertask/raw/main/cronjobs.json
-```
-
-### Extended crontab syntax
-
-Traditional Unix Cron uses just 5 components to define schedules, like
-`minute, hour, day (month), month, day (week)`.
-```
-# Every minute.
-* * * * *
-
-# Every 10 minutes.
-*/10 * * * *
-```
--- https://crontab.guru/every-minute
--- https://crontab.guru/every-ten-minutes
-
-On the other hand, APScheduler provides an extended 6- or 7-tuple syntax,
-adding an optional scheduling unit for **seconds** on the left hand side, and
-another one for scheduling **years** on the right hand side, like
-`second (0-59), minute (0-59), hour (0-23), day of month (1-31), month
-(1-12), day of week (0-6)`.
-```
-# Every 10 seconds, starting 2026.
-*/10 * * * * * 2026
-```
--- https://crontabkit.com/crontab-every-10-seconds
-
-## Development
-
-For installing a development sandbox, please refer to the [development sandbox
-documentation].
 
 
 [APScheduler]: https://pypi.org/project/APScheduler/
 [cron]: https://en.wikipedia.org/wiki/Cron
-[development sandbox documentation]: https://github.com/pyveci/supertask/blob/master/docs/sandbox.md
 [DWIM]: https://en.wikipedia.org/wiki/DWIM
 [FastAPI]: https://pypi.org/project/fastapi/
 [Pydantic]: https://pypi.org/project/pydantic/
 [SQLAlchemy]: https://pypi.org/project/SQLAlchemy/
 [UX]: https://en.wikipedia.org/wiki/User_experience
+
+[Changelog]: https://github.com/pyveci/supertask/blob/main/CHANGES.md
+[Community Forum]: https://community.panodata.org/
+[Documentation]: https://supertask.readthedocs.io/
+[Issues]: https://github.com/pyveci/supertask/issues
+[License]: https://github.com/pyveci/supertask/blob/main/LICENSE
+[PyPI]: https://pypi.org/project/supertask/
+[Supertask Handbook]: https://supertask.readthedocs.io/handbook.html
+[Supertask Installation]: https://supertask.readthedocs.io/install.html
+[Supertask Sandbox]: https://supertask.readthedocs.io/sandbox.html
+[Source code]: https://github.com/pyveci/supertask
+
+[badge-ci]: https://github.com/pyveci/supertask/actions/workflows/main.yml/badge.svg
+[badge-coverage]: https://codecov.io/gh/pyveci/supertask/branch/main/graph/badge.svg
+[badge-downloads-per-month]: https://pepy.tech/badge/supertask/month
+[badge-license]: https://img.shields.io/github/license/pyveci/supertask.svg
+[badge-package-version]: https://img.shields.io/pypi/v/supertask.svg
+[badge-python-versions]: https://img.shields.io/pypi/pyversions/supertask.svg
+[badge-release-notes]: https://img.shields.io/github/release/pyveci/supertask?label=Release+Notes
+[badge-status]: https://img.shields.io/pypi/status/supertask.svg
+[project-ci]: https://github.com/pyveci/supertask/actions/workflows/main.yml
+[project-coverage]: https://app.codecov.io/gh/pyveci/supertask
+[project-downloads]: https://pepy.tech/project/supertask/
+[project-license]: https://github.com/pyveci/supertask/blob/main/LICENSE
+[project-pypi]: https://pypi.org/project/supertask
+[project-release-notes]: https://github.com/pyveci/supertask/releases

@@ -7,16 +7,19 @@ requires = [
 
 [project]
 name = "supertask"
-description = "Supertask, a convenience job scheduler"
+description = "A convenience job scheduler."
 readme = "README.md"
 keywords = [
   "apscheduler",
+  "automation",
   "cron",
   "interval",
   "jobs",
+  "recurrent",
   "scheduler",
   "scheduling",
   "tasks",
+  "timetable",
   "toolkit",
 ]
 license = "AGPL-3.0-or-later"
@@ -27,7 +30,7 @@ authors = [
 ]
 requires-python = ">=3.9"
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 1 - Planning",
   "Environment :: Console",
   "Intended Audience :: Customer Service",
   "Intended Audience :: Developers",
@@ -115,10 +118,10 @@ optional-dependencies.test = [
   "pytest-cov<7",
   "pytest-mock<4",
 ]
-urls.changelog = "https://github.com/pyveci/supertask/blob/main/CHANGES.md"
-urls.documentation = "https://github.com/pyveci/supertask"
-urls.homepage = "https://github.com/pyveci/supertask"
-urls.repository = "https://github.com/pyveci/supertask"
+urls.Changelog = "https://github.com/pyveci/supertask/blob/main/CHANGES.md"
+urls.Documentation = "https://supertask.readthedocs.io/"
+urls.Issues = "https://github.com/pyveci/supertask/issues"
+urls.Repository = "https://github.com/pyveci/supertask"
 scripts.st = "supertask.cli:cli"
 scripts.supertask = "supertask.cli:cli"
 
