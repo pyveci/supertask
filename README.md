@@ -37,8 +37,7 @@ pinning is strongly recommended, especially when you use it as a library.
 ## Setup
 
 ```shell
-pip install --upgrade --prefer-binary -r requirements.txt -r requirements-dev.txt
-pip install --upgrade --prefer-binary --editable=.
+uv run --with='supertask @ git+https://github.com/pyveci/supertask.git' supertask --version
 ```
 
 
