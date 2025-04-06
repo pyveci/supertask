@@ -8,8 +8,6 @@ from icecream import ic
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from supertask.vendor.jobs import my_job
-
 from .database import JsonResource
 
 logger = logging.getLogger(__name__)
@@ -28,26 +26,28 @@ class JobSeeder:
         for cronjob in cronjobs:
             if cronjob.enabled:
                 ic(cronjob)
-                minute, hour, day, month, day_of_week = cronjob.crontab.split()
-                self.scheduler.add_job(
-                    my_job,
-                    "cron",
-                    minute=minute,
-                    hour=hour,
-                    day=day,
-                    month=month,
-                    day_of_week=day_of_week,
-                    id=str(cronjob.id),
-                    jobstore="default",
-                    args=[cronjob.job],
-                    max_instances=4,
-                )
+                self.add_job(cronjob)
         return self
+
+    def add_job(self, cronjob, reschedule=False):
+        method = self.scheduler.add_job
+        if reschedule:
+            method = self.scheduler.reschedule_job
+        cron_kwargs = cronjob.decode_crontab()
+        method(
+            cronjob.exec_python_ref,
+            "cron",
+            id=str(cronjob.id),
+            jobstore="default",
+            args=[cronjob.exec_args],
+            max_instances=10,
+            **cron_kwargs,
+        )
 
     def start_filesystem_observer(self):
         logger.info("Starting filesystem observer")
         # Create an instance of FileChangeHandler with the scheduler
-        file_change_handler = FileChangeHandler(source=self.source, scheduler=self.scheduler)
+        file_change_handler = FileChangeHandler(seeder=self)
 
         # Watch cronjobs.json for changes in scheduled jobs
         observer = Observer()
@@ -58,9 +58,10 @@ class JobSeeder:
 
 # ruff: noqa: ERA001
 class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
-    def __init__(self, source: str, scheduler: BaseScheduler):
-        self.source = source
-        self.scheduler = scheduler
+    def __init__(self, seeder: JobSeeder):
+        self.seeder = seeder
+        self.source = self.seeder.source
+        self.scheduler = self.seeder.scheduler
         self.last_modified = time.time()
 
     def on_modified(self, event):
@@ -94,19 +95,7 @@ class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
                 # ic(existing_job_ids)
                 if cronjob.enabled and str(cronjob.id) not in existing_job_ids:
                     # ic("ADD: ", cronjob.id)
-                    minute, hour, day, month, day_of_week = cronjob.crontab.split()
-                    job = self.scheduler.add_job(
-                        my_job,
-                        "cron",
-                        minute=minute,
-                        hour=hour,
-                        day=day,
-                        month=month,
-                        day_of_week=day_of_week,
-                        id=str(cronjob.id),
-                        jobstore="default",
-                        args=[cronjob.job],
-                    )
+                    self.seeder.add_job(cronjob)
                     next_run_time = job.trigger.get_next_fire_time(None, dt.datetime.now())
                     ic("ADDED: ", cronjob.job, next_run_time)
 
@@ -114,14 +103,5 @@ class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
             for cronjob in cronjobs:
                 if cronjob.enabled:
                     # ic(cronjob.id)
-                    minute, hour, day, month, day_of_week = cronjob.crontab.split()
-                    job = self.scheduler.reschedule_job(
-                        str(cronjob.id),
-                        trigger="cron",
-                        minute=minute,
-                        hour=hour,
-                        day=day,
-                        month=month,
-                        day_of_week=day_of_week,
-                    )
+                    self.seeder.add_job(cronjob, reschedule=True)
                     ic("RESCHED: ", cronjob.job, job.next_run_time)
