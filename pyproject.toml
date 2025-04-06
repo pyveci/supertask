@@ -104,7 +104,16 @@ optional-dependencies.develop = [
   "poethepoet<1",
   "pyproject-fmt<3",
   "ruff<0.12",
+  "sphinx-autobuild",
   "validate-pyproject<1",
+]
+optional-dependencies.docs = [
+  "furo==2024.8.6",
+  "myst-parser[linkify]>=0.18,<5",
+  "sphinx-copybutton",
+  "sphinx-design-elements<1",
+  "sphinxcontrib-mermaid<2",
+  "sphinxext-opengraph<1",
 ]
 optional-dependencies.release = [
   "build<2",
@@ -233,6 +242,16 @@ check = [
   "test",
 ]
 
+docs-autobuild = [
+  { cmd = "sphinx-autobuild --open-browser --watch docs docs docs/_build" },
+]
+docs-html = [
+  { cmd = "sphinx-build -W --keep-going docs docs/_build" },
+]
+docs-linkcheck = [
+  { cmd = "sphinx-build -W --keep-going -b linkcheck docs docs/_build" },
+]
+
 format = [
   { cmd = "ruff format ." },
   # Configure Ruff not to auto-fix (remove!):
@@ -250,7 +269,7 @@ lint = [
 
 release = [
   { cmd = "python -m build" },
-  { cmd = "twine upload dist/*" },
+  { cmd = "twine upload --skip-existing dist/*" },
 ]
 
 test = { cmd = "pytest" }

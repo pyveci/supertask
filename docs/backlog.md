@@ -1,4 +1,4 @@
-# Supertask backlog
+# Backlog
 
 ## Iteration +1
 - Use regular logging instead of `icecream`
@@ -7,6 +7,7 @@
 - Provide other schedules than `cron`
 - Launch command-line targets, using `uv`
 - Documentation: `--pre-seed-jobs` can access a wide range of remote resources
+- Naming things: `supertask timetable.yaml`
 - Project scaffolding
 - Release v0.0.2
 

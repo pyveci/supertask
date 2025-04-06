@@ -1,4 +1,4 @@
-# Development Sandbox
+# Sandbox
 
 ## Introduction
 

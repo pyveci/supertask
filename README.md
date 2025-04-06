@@ -1,14 +1,18 @@
 # Supertask
 
-Supertask is a convenience job scheduler based on [APScheduler], [FastAPI],
-[Pydantic], [SQLAlchemy], and a few other excellent packages.
+Supertask is a convenience task runner for programming recurrent or otherwise
+scheduled jobs, based on the excellent [APScheduler], [FastAPI], [Pydantic],
+and [SQLAlchemy] packages, amongst others.
 
 You can use Supertask to invoke time-driven actions like the venerable [cron]
-daemon is doing it. It can be used both as a standalone program, and as a
-library.
+daemon and the contemporary [systemd timers] are doing it. It can be used both
+as a standalone program/service, and as a library.
 
-Supertask aims for [DWIM]-like usefulness and [UX], and provides CLI-, HTTP-,
-and other interfaces.
+[![CI][badge-ci]][project-ci]
+[![Coverage][badge-coverage]][project-coverage]
+[![Downloads per month][badge-downloads-per-month]][project-downloads]
+[![License][badge-license]][project-license]
+[![Release Notes][badge-release-notes]][project-release-notes]
 
 » [Documentation]
 | [Changelog]
@@ -18,20 +22,11 @@ and other interfaces.
 | [License]
 | [Community Forum]
 
-[![CI][badge-ci]][project-ci]
-[![Coverage][badge-coverage]][project-coverage]
-[![Downloads per month][badge-downloads-per-month]][project-downloads]
-[![License][badge-license]][project-license]
-
-[![Release Notes][badge-release-notes]][project-release-notes]
-[![Package version][badge-package-version]][project-pypi]
-[![Status][badge-status]][project-pypi]
-[![Supported Python versions][badge-python-versions]][project-pypi]
-
 ## Features
 
 - Store jobs in databases supported by SQLAlchemy.
-- HTTP API to manipulate the job data model.
+- Supertask aims for [DWIM]-like usefulness and [UX], and provides CLI-,
+  HTTP-, and other interfaces.
 - Optionally, jobs can be pre-seeded from a JSON file `config.json`, either
   from the local filesystem, or from a wide range of remote locations.
   When using the filesystem, a watchdog monitors the file for changes, in
@@ -45,6 +40,10 @@ in order to make it more solid, and to add features.
 
 Breaking changes should be expected until a 1.0 release, so applying
 version pinning is strongly recommended when consuming the packages.
+
+[![Status][badge-status]][project-pypi]
+[![Package version][badge-package-version]][project-pypi]
+[![Supported Python versions][badge-python-versions]][project-pypi]
 
 ## Installation
 
@@ -66,6 +65,7 @@ See [Supertask Sandbox].
 [FastAPI]: https://pypi.org/project/fastapi/
 [Pydantic]: https://pypi.org/project/pydantic/
 [SQLAlchemy]: https://pypi.org/project/SQLAlchemy/
+[systemd timers]: https://opensource.com/article/20/7/systemd-timers
 [UX]: https://en.wikipedia.org/wiki/User_experience
 
 [Changelog]: https://github.com/pyveci/supertask/blob/main/CHANGES.md
