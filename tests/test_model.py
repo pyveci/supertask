@@ -36,7 +36,11 @@ def test_cronjob_success_5():
 
 def test_cronjob_success_6():
     """
-    Validate decoding succeeds with 5 fields worth of crontab syntax, including seconds.
+    Test that the crontab method parses a cron string with seconds correctly.
+    
+    This test creates a ScheduleItem using the cron string "*/10 * * * * *"
+    and asserts that the parsed dictionary has "second" set to "*/10", "minute"
+    set to "*", and "year" as None, validating support for six-field cron syntax.
     """
     schedule = ScheduleItem(cron="*/10 * * * * *")
     crontab = schedule.crontab()
@@ -47,7 +51,11 @@ def test_cronjob_success_6():
 
 def test_cronjob_success_7():
     """
-    Validate decoding succeeds with 5 fields worth of crontab syntax, including year.
+    Test that crontab decodes strings with seconds and year.
+    
+    This test verifies that a ScheduleItem created with a cron string containing a seconds
+    field, minute, and year returns a dictionary mapping: "second" to "*/10", "minute" to "*",
+    and "year" to "2026".
     """
     schedule = ScheduleItem(cron="*/10 * * * * * 2026")
     crontab = schedule.crontab()
