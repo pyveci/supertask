@@ -1,4 +1,4 @@
-from supertask.vendor.jobs import example_waiter
+from supertask.contrib.testing import example_waiter
 
 
 def test_my_job(mocker, capsys):

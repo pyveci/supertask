@@ -9,11 +9,11 @@ from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.util import ref_to_obj
 from halo import Halo
 from icecream import ic
 
-from supertask.http.service import HTTPAPI
-from supertask.model import JobStoreLocation, Settings
+from supertask.model import JobStore, Settings, Task
 from supertask.store.cratedb import CrateDBSQLAlchemyJobStore
 
 logger = logging.getLogger(__name__)
@@ -26,22 +26,26 @@ class Supertask:
 
     def __init__(
         self,
-        store: t.Union[JobStoreLocation, str],
+        store: t.Union[JobStore, str],
         pre_delete_jobs: bool = False,
         pre_seed_jobs: str = None,
         debug: bool = False,
     ):
         # Bundle settings to be able to propagate them to the FastAPI subsystem.
         if isinstance(store, str):
-            store = JobStoreLocation(address=store)
+            store = JobStore.from_address(store)
         self.settings = Settings(
-            store_location=store,
+            store=store,
             pre_delete_jobs=pre_delete_jobs,
             pre_seed_jobs=pre_seed_jobs,
         )
         self.debug = debug
         self.scheduler: BackgroundScheduler = None
-        self.configure()
+        self.listen_http: t.Optional[str] = None
+
+    def with_namespace(self, namespace: str) -> "Supertask":
+        self.settings.store.with_namespace(namespace)
+        return self
 
     def configure(self):
         """
@@ -50,9 +54,9 @@ class Supertask:
         logger.info("Configuring scheduler")
 
         # Initialize a job store.
-        address = self.settings.store_location.address
-        schema = self.settings.store_location.schema
-        table = self.settings.store_location.table
+        address = self.settings.store.address
+        schema = self.settings.store.schema
+        table = self.settings.store.table
         if address.startswith("memory://"):
             job_store = MemoryJobStore()
         elif address.startswith("postgresql://"):
@@ -90,10 +94,12 @@ class Supertask:
         )
         return self
 
-    def start(self, listen_http: str = None):
+    def with_http_server(self, listen_http: str):
+        self.listen_http = listen_http
+
+    def start(self):
         self.start_scheduler()
-        if listen_http:
-            self.start_http_service(listen_http)
+        self.start_http_service()
         return self
 
     def start_scheduler(self):
@@ -106,7 +112,7 @@ class Supertask:
             ic(job.id, job.next_run_time)
         return self
 
-    def wait(self):
+    def run_forever(self):
         print("Press Ctrl+{0} to exit".format("Break" if os.name == "nt" else "C"))  # noqa: T201
         spinner = Halo(text="Waiting", spinner="dots")
         spinner.start()
@@ -119,7 +125,33 @@ class Supertask:
             self.scheduler.shutdown()
         return self
 
-    def start_http_service(self, listen_http: str):
-        httpapi = HTTPAPI(settings=self.settings, listen_address=listen_http, debug=self.debug)
-        httpapi.start()
+    def start_http_service(self):
+        if self.listen_http:
+            # httpapi = HTTPAPI(settings=self.settings, listen_address=self.listen_http, debug=self.debug)  # noqa: ERA001, E501
+            # httpapi.start()  # noqa: ERA001
+            pass
         return self
+
+
+class TaskRunner:
+    """
+    Execute task payloads.
+
+    TODO: Capture and provide results.
+    """
+
+    def run(self, *args, **kwargs):
+        task = Task(**kwargs)
+        for step in task.steps:
+            if not step.if_:
+                logger.info(f"Skipping step {step.name}")
+                continue
+            if step.uses == "python-entrypoint":
+                func = ref_to_obj(step.run)
+                retval = func(*step.args, **step.kwargs)
+                logger.info(f"Result: {retval}")
+            else:
+                raise RuntimeError(f"Unknown step type: {step.uses}")
+
+
+taskrunner = TaskRunner()

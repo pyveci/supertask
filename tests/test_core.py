@@ -7,8 +7,8 @@ import sqlalchemy as sa
 from cratedb_toolkit.util import DatabaseAdapter
 
 from supertask.core import Supertask
-from supertask.model import JobStoreLocation
-from supertask.provision.seeder import JobSeeder
+from supertask.load import TimetableLoader
+from supertask.model import JobStore, Timetable
 
 logger = logging.getLogger(__name__)
 
@@ -30,19 +30,19 @@ def check_store(address: str):
     "job_store_address",
     ["memory://", "postgresql://postgres:postgres@localhost:5433", "crate://crate@localhost/?schema=testdrive"],
 )
-def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_file):
+def test_supertask_stores_seeded_file(caplog, job_store_address, taskfile_yaml):
     check_store(job_store_address)
 
-    st = Supertask(store=job_store_address, pre_delete_jobs=True, pre_seed_jobs=cronjobs_json_file)
-    js = JobSeeder(source=cronjobs_json_file, scheduler=st.scheduler)
-    js.seed_jobs()
+    st = Supertask(store=job_store_address, pre_delete_jobs=True, pre_seed_jobs=taskfile_yaml).configure()
+    tt = Timetable.load(taskfile_yaml)
+    TimetableLoader(scheduler=st.scheduler).load(tt)
     st.start()
 
     assert "Configuring scheduler" in caplog.messages
-    assert "Seeding jobs" in caplog.text
+    assert "Loading task(s) from file. Source: examples/canonical/timetable.yaml" in caplog.text
     assert "Adding job tentatively -- it will be properly scheduled when the scheduler starts" in caplog.messages
     assert "Starting scheduler" in caplog.messages
-    assert 'Added job "example_waiter" to job store "default"' in caplog.messages
+    assert 'Added job "Example Python reference" to job store "default"' in caplog.messages
 
 
 @pytest.mark.skip(reason="Does not work when job representation changes")
@@ -50,19 +50,19 @@ def test_supertask_stores_seeded_file(caplog, job_store_address, cronjobs_json_f
     "job_store_address",
     ["memory://", "postgresql://postgres:postgres@localhost:5433", "crate://crate@localhost/?schema=testdrive"],
 )
-def test_supertask_stores_seeded_url(caplog, job_store_address, cronjobs_json_url):
+def test_supertask_stores_seeded_url(caplog, job_store_address, taskfile_yaml_url):
     check_store(job_store_address)
 
-    st = Supertask(store=job_store_address, pre_delete_jobs=True, pre_seed_jobs=cronjobs_json_url)
-    js = JobSeeder(source=cronjobs_json_url, scheduler=st.scheduler)
-    js.seed_jobs()
+    st = Supertask(store=job_store_address, pre_delete_jobs=True, pre_seed_jobs=taskfile_yaml_url)
+    js = TimetableLoader(source=taskfile_yaml_url, scheduler=st.scheduler)
+    js.load()
     st.start()
 
     assert "Configuring scheduler" in caplog.messages
-    assert "Seeding jobs" in caplog.text
+    assert "Loading task(s) from file. Source: examples/canonical/timetable.yaml" in caplog.text
     assert "Adding job tentatively -- it will be properly scheduled when the scheduler starts" in caplog.messages
     assert "Starting scheduler" in caplog.messages
-    assert 'Added job "example_waiter" to job store "default"' in caplog.messages
+    assert 'Added job "Example Python reference" to job store "default"' in caplog.messages
 
 
 def dummy_job(param1: str):
@@ -73,7 +73,7 @@ def test_supertask_cratedb_store(caplog):
     # Create a job using Supertask.
     job_store_address = "crate://crate@localhost/"
     check_store(job_store_address)
-    st = Supertask(JobStoreLocation(address=job_store_address, schema="testdrive"), pre_delete_jobs=True)
+    st = Supertask(JobStore(address=job_store_address, schema="testdrive"), pre_delete_jobs=True).configure()
     reference_time = dt.datetime(year=8022, month=1, day=1, tzinfo=dt.timezone.utc)
     st.scheduler.add_job(
         dummy_job, args=["something"], trigger="interval", id="foo", name="bar", next_run_time=reference_time
@@ -93,12 +93,12 @@ def test_supertask_cratedb_custom_schema_and_table(caplog):
     # Create a job using Supertask.
     job_store_address = "crate://crate@localhost/"
     check_store(job_store_address)
-    store_location = JobStoreLocation(
+    store_location = JobStore(
         address=job_store_address,
         schema="testdrive",
         table="bar",
     )
-    st = Supertask(store_location, pre_delete_jobs=True)
+    st = Supertask(store_location, pre_delete_jobs=True).configure()
     reference_time = dt.datetime(year=8022, month=1, day=1, tzinfo=dt.timezone.utc)
     st.scheduler.add_job(
         dummy_job, args=["something"], trigger="interval", id="foo", name="bar", next_run_time=reference_time
@@ -116,5 +116,5 @@ def test_supertask_cratedb_custom_schema_and_table(caplog):
 
 def test_supertask_unknown_store():
     with pytest.raises(RuntimeError) as ex:
-        Supertask("foo://")
+        Supertask("foo://").configure()
     assert ex.match("Initializing job store failed. Unknown address: foo://")

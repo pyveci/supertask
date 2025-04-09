@@ -21,3 +21,5 @@
 - Refactored scheduling and rescheduling, improved data model
 - Documentation: Added Sphinx and Read the Docs, publishing to
   https://supertask.readthedocs.io/
+- Refactored data model and CLI
+- Removed HTTP service
