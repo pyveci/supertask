@@ -32,6 +32,20 @@ class Supertask:
         debug: bool = False,
     ):
         # Bundle settings to be able to propagate them to the FastAPI subsystem.
+        """
+        Initializes a Supertask instance with a job store and task configuration options.
+        
+        If the provided store is a string, it is converted to a JobStore using its address.
+        Job store settings along with options to pre-delete and pre-seed jobs are bundled into a
+        Settings object. Debug mode is configured, and the scheduler and HTTP listener are initialized
+        to None.
+          
+        Args:
+            store: A JobStore instance or a string representing the job store address.
+            pre_delete_jobs: If True, existing jobs will be removed before setup.
+            pre_seed_jobs: Optional configuration for pre-seeding jobs.
+            debug: Flag indicating whether debugging is enabled.
+        """
         if isinstance(store, str):
             store = JobStore.from_address(store)
         self.settings = Settings(
@@ -44,12 +58,35 @@ class Supertask:
         self.listen_http: t.Optional[str] = None
 
     def with_namespace(self, namespace: str) -> "Supertask":
+        """
+        Sets the job store namespace.
+        
+        Updates the job store configuration to use the specified namespace and returns the current
+        Supertask instance, allowing for method chaining.
+        
+        Args:
+            namespace: A string identifier for scoping job store entries.
+        
+        Returns:
+            Supertask: The instance with the updated namespace.
+        """
         self.settings.store.with_namespace(namespace)
         return self
 
     def configure(self):
         """
-        https://apscheduler.readthedocs.io/en/3.x/userguide.html#configuring-the-scheduler
+        Configures the scheduler based on job store settings.
+        
+        Initializes the job store using the address from settings, selecting a memory, PostgreSQL, or CrateDB
+        backend depending on the address scheme. If pre-deletion is enabled, existing jobs are removed.
+        The method then creates a BackgroundScheduler with default job settings, custom thread and process
+        executors, and sets the timezone to Europe/Vienna.
+        
+        Returns:
+            self: The instance with its scheduler configured.
+        
+        Raises:
+            RuntimeError: If the job store address has an unsupported protocol.
         """
         logger.info("Configuring scheduler")
 
@@ -95,14 +132,36 @@ class Supertask:
         return self
 
     def with_http_server(self, listen_http: str):
+        """
+        Sets the HTTP server listening address.
+        
+        Assigns the specified address to the instance for later use when starting the HTTP service.
+        """
         self.listen_http = listen_http
 
     def start(self):
+        """
+        Starts the scheduler and HTTP service, then returns the instance.
+        
+        Initiates the scheduler to run background tasks and attempts to start the HTTP
+        service if a listening address has been specified. Returns the current instance
+        to enable chained operations.
+        
+        Returns:
+            Supertask: The current instance.
+        """
         self.start_scheduler()
         self.start_http_service()
         return self
 
     def start_scheduler(self):
+        """
+        Starts the scheduler and logs the next scheduled run times for all jobs.
+        
+        This method logs that the scheduler is starting, initiates the background scheduler,
+        and then iterates over all registered jobs to log each job's identifier along with the
+        next time it is scheduled to run. It returns the instance to allow method chaining.
+        """
         logger.info("Starting scheduler")
         self.scheduler.start()
 
@@ -113,6 +172,16 @@ class Supertask:
         return self
 
     def run_forever(self):
+        """
+        Run the application indefinitely until an exit signal is received.
+        
+        Prints exit instructions and starts a spinner indicator while the function enters an
+        infinite loop to simulate ongoing activity. On receiving a KeyboardInterrupt or
+        SystemExit, it gracefully shuts down the scheduler and returns the current instance.
+        
+        Returns:
+            Self instance.
+        """
         print("Press Ctrl+{0} to exit".format("Break" if os.name == "nt" else "C"))  # noqa: T201
         spinner = Halo(text="Waiting", spinner="dots")
         spinner.start()
@@ -126,6 +195,17 @@ class Supertask:
         return self
 
     def start_http_service(self):
+        """
+        Starts the HTTP service if a listen address is configured.
+        
+        If an HTTP listen address is set, this method is intended to initialize and start
+        the corresponding HTTP API service using the current settings and debug mode.
+        Currently, the service initialization code is commented out, making this a
+        placeholder implementation.
+        
+        Returns:
+            Self, to enable method chaining.
+        """
         if self.listen_http:
             # httpapi = HTTPAPI(settings=self.settings, listen_address=self.listen_http, debug=self.debug)  # noqa: ERA001, E501
             # httpapi.start()  # noqa: ERA001
@@ -141,6 +221,16 @@ class TaskRunner:
     """
 
     def run(self, *args, **kwargs):
+        """
+        Executes task steps sequentially.
+        
+        Instantiates a Task object using the provided keyword arguments and processes
+        each of its steps in order. For any step where the condition is not met,
+        logs that the step is skipped. For steps specifying a Python entry point,
+        resolves and executes the corresponding function with the step’s arguments,
+        logging its result. Raises a RuntimeError if an unrecognized step type is
+        encountered.
+        """
         task = Task(**kwargs)
         for step in task.steps:
             if not step.if_:

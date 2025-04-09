@@ -47,6 +47,13 @@ def cli(
     verbose: bool,
     debug: bool,
 ):
+    """Initializes CLI logging, job store, and task scheduler configuration.
+    
+    Sets up logging based on the verbose and debug flags, creates a job store from the provided SQLAlchemy
+    URL with optional schema and table parameters, and initializes a task scheduler (supertask) with
+    options to pre-delete and pre-seed jobs. The job store and task scheduler are stored in the Click
+    context metadata for later use by subcommands.
+    """
     if verbose:
         setup_logging(debug=debug)
     store = JobStore \
@@ -71,7 +78,16 @@ def cli(
 @click.pass_context
 def run(ctx: click.Context, taskfile: str):
     """
-    Run task manager.
+    Run the task manager indefinitely using tasks from a timetable file.
+    
+    This function retrieves a preconfigured task manager from the Click context,
+    loads a timetable from the specified file, and configures the task manager using
+    the timetable's namespace. A timetable loader is then used to incorporate the
+    tasks into the scheduler. After starting the task manager, it enters an infinite
+    loop to continuously execute the scheduled tasks.
+    
+    Parameters:
+        taskfile (str): Path to the file defining the timetable for task scheduling.
     """
     supertask: Supertask = ctx.meta["supertask"]
     timetable = Timetable.load(taskfile)

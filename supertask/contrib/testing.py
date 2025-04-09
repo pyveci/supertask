@@ -5,6 +5,19 @@ from icecream import ic
 
 
 def example_waiter(*args, **kwargs) -> float:
+    """
+    Simulate a workload delay with optional jitter.
+    
+    Logs the start time, computes a delay time by generating a random duration between 5 and 10
+    seconds augmented by an optional jitter value, pauses execution for that duration, logs the
+    finish details, and returns a fixed result.
+    
+    Args:
+        jitter (int, optional): Extra seconds added to the delay. Defaults to 0.
+    
+    Returns:
+        float: The constant value 42.42.
+    """
     jitter = kwargs.pop("jitter", 0)
 
     # Report about job start.

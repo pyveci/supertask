@@ -34,13 +34,49 @@ class JobStore:
 
     @classmethod
     def from_address(cls, address: str) -> "JobStore":
+        """
+        Creates a JobStore instance from a given address.
+        
+        This class method initializes a new JobStore object using the provided
+        database address.
+        
+        Args:
+            address (str): The database address to initialize the JobStore.
+        
+        Returns:
+            JobStore: A new JobStore instance configured with the specified address.
+        """
         return cls(address=address)
 
     def with_namespace(self, namespace: str) -> "JobStore":
+        """
+        Sets the table name using the provided namespace.
+        
+        This method updates the JobStore object's table attribute by concatenating the NS_TABLE_PREFIX with the given namespace, and returns the updated instance for method chaining.
+        
+        Args:
+            namespace: The namespace identifier appended to the prefix for the table name.
+        
+        Returns:
+            The modified JobStore instance.
+        """
         self.table = f"{self.NS_TABLE_PREFIX}{namespace}"
         return self
 
     def with_options(self, schema: t.Optional[str] = None, table: t.Optional[str] = None) -> "JobStore":
+        """
+        Update the job store's schema and table options.
+        
+        If a new schema or table name is provided, update the corresponding attribute on the
+        job store instance and return the instance for method chaining.
+        
+        Args:
+            schema: Optional new schema name. If not provided, the current schema remains unchanged.
+            table: Optional new table name. If not provided, the current table remains unchanged.
+        
+        Returns:
+            The job store instance with updated schema and/or table.
+        """
         if schema:
             self.schema = schema
         if table:
@@ -68,6 +104,22 @@ class ScheduleItem(BaseModel):
     # TODO: Enable validation. Hint: It is more complex than this.
     # @validator('cron')
     def validate_cron(cls, v):
+        """
+        Validate a crontab expression string.
+        
+        Checks that the provided cron expression matches a pattern with 5 to 7
+        space-separated fields. Raises a ValueError if the expression does not
+        conform to the expected format.
+        
+        Args:
+            v (str): The cron expression string to validate.
+        
+        Returns:
+            str: The validated cron expression.
+            
+        Raises:
+            ValueError: If the cron expression fails to match the required pattern.
+        """
         pattern = r"(((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*) ?){5,7}"
         if not re.match(pattern, v):
             raise ValueError("Invalid crontab syntax")
@@ -75,13 +127,19 @@ class ScheduleItem(BaseModel):
 
     def crontab(self):
         """
-        Extended crontab expressions, including sub-minute resolutions and year constraints.
-        It is a 7-tuple, while traditionally it's only 5 components. Example:
-
-            Humanized: Every 10 seconds, only in 2026.
-            Expression: */10 * * * * * 2026
-
-        -- https://crontabkit.com/crontab-every-10-seconds
+        Parse a cron expression into its constituent time fields.
+        
+        This method accepts extended cron expressions that can include optional seconds and year
+        fields. It supports expressions with 5, 6, or 7 space-separated components. For a 5-part
+        expression (minute, hour, day, month, day_of_week), both seconds and year are set to None.
+        For a 6-part expression (second, minute, hour, day, month, day_of_week), the year remains None.
+        
+        Raises:
+            ValueError: If the cron expression does not consist of 5, 6, or 7 components.
+        
+        Returns:
+            dict: A dictionary with keys 'second', 'minute', 'hour', 'day', 'month', 'day_of_week',
+                  and 'year', representing the parsed components from the cron expression.
         """
         second, minute, hour, day, month, day_of_week, year = [None] * 7
         try:
@@ -143,7 +201,11 @@ class Timetable(BaseModel):
 
     def model_post_init(self, __context: t.Any) -> None:
         """
-        Adjust model after initialization.
+        Assign a namespace identifier if missing in metadata.
+        
+        After initialization, checks if the metadata dictionary lacks a valid namespace under the key
+        defined by NAMESPACE_ATTRIBUTE and, if so, sets an ephemeral identifier using
+        make_namespace_identifier(). The __context parameter is reserved for interface consistency and is not used.
         """
         # If the timetable file or resource does not provide a namespace identifier, provide an ephemeral one.
         if self.NAMESPACE_ATTRIBUTE not in self.meta or not self.meta[self.NAMESPACE_ATTRIBUTE]:
@@ -158,10 +220,25 @@ class Timetable(BaseModel):
 
     def make_namespace_identifier(self):
         """
-        Provide an ephemeral namespace identifier when needed.
+        Generates an ephemeral namespace identifier.
+        
+        This method constructs an identifier by computing an MD5 hash of a string formed from the
+        current host name, user name, and a resource value obtained from the instance metadata.
+        If the resource value corresponds to an existing file path, its absolute path is used.
         """
 
         def digest(value):
+            """
+            Computes the MD5 hexadecimal digest of the input string.
+            
+            Encodes the string using UTF-8 and returns the hash as a hexadecimal string.
+            
+            Args:
+                value: The string to be hashed.
+            
+            Returns:
+                A hexadecimal string representing the MD5 digest of the input.
+            """
             return hashlib.md5(value.encode()).hexdigest()  # noqa: S324
 
         hostname = socket.gethostname()
@@ -174,7 +251,19 @@ class Timetable(BaseModel):
     @classmethod
     def load(cls, taskfile: str):
         """
-        Load task definitions from file or resource.
+        Load a task or timetable definition from a JSON or YAML file.
+        
+        This method reads the specified file, parses its content based on the file
+        extension, and embeds the source file identifier into the metadata using the
+        class-specific SOURCE_ATTRIBUTE. JSON files must end with ".json" while YAML
+        files require a ".yaml" or ".yml" extension. A NotImplementedError is raised if
+        the file type is unsupported.
+        
+        Args:
+            taskfile: Path to the task definition file.
+        
+        Returns:
+            An instance of the class populated with data from the file.
         """
         logger.info(f"Loading task(s) from file. Source: {taskfile}")
 
@@ -203,7 +292,14 @@ class CronJob(BaseModel):
     @property
     def duration(self) -> float:
         """
-        Duration in seconds if the job has finished.
+        Calculates the job's duration in seconds.
+        
+        Computes the elapsed time between the job's start and end timestamps by subtracting the start 
+        time from the end time and converting the resulting timedelta to seconds. Raises a RuntimeError 
+        if the job has not finished (i.e., the end timestamp is not set).
+        
+        Returns:
+            float: The duration of the job in seconds.
         """
         if not self.end:
             raise RuntimeError("Job has not finished yet")
@@ -213,7 +309,11 @@ class CronJob(BaseModel):
     @property
     def elapsed(self) -> float:
         """
-        Elapsed time in seconds.
+        Returns the elapsed time for the job in seconds.
+        
+        If the job's duration is available (typically when the job has completed), that
+        value is returned. Otherwise, the elapsed time is computed as the difference
+        between the current time and the job's start time, converted to seconds.
         """
         try:
             return self.duration
@@ -223,7 +323,12 @@ class CronJob(BaseModel):
 
     @staticmethod
     def delta_duration(delta: dt.timedelta) -> float:
-        """Convert dt.timedelta to seconds."""
+        """
+        Convert a timedelta to its total duration in seconds.
+        
+        Calculates the complete duration represented by the given datetime.timedelta,
+        including the fractional part of a second.
+        """
         return delta.total_seconds() + (delta.microseconds / 1_000_000)
 
 

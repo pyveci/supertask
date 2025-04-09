@@ -8,6 +8,12 @@ from supertask.cli import cli
 
 @pytest.fixture
 def st_wait_noop(mocker):
+    """
+    Disables Supertask.run_forever to prevent infinite execution during tests.
+    
+    This fixture uses the provided mocker to patch the Supertask.run_forever method with a no-operation,
+    ensuring that tests run without being blocked by an endless loop.
+    """
     mocker.patch("supertask.core.Supertask.run_forever")
 
 
