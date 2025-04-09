@@ -17,12 +17,36 @@ logger = logging.getLogger(__name__)
 
 class TimetableLoader:
     def __init__(self, scheduler: BaseScheduler, start_observer: bool = False):
+        """
+        Initializes a TimetableLoader instance.
+        
+        Sets up the instance with the provided scheduler for task management and an optional flag to enable file observation for real-time timetable updates. Raises a ValueError if the scheduler is not provided.
+         
+        Parameters:
+            scheduler: A BaseScheduler instance used to schedule tasks.
+            start_observer: Boolean flag to determine if a file observer should be started.
+        """
         if scheduler is None:
             raise ValueError("Unable to use scheduler. Did you miss to invoke `supertask.configure()`?")
         self.scheduler = scheduler
         self.start_observer = start_observer
 
     def add(self, task: Task, reschedule=False):
+        """
+        Add a task to the scheduler based on its cron schedule.
+        
+        This method iterates over each schedule in the task and, for schedules marked as cron, it
+        adds a corresponding job to the scheduler. The job is configured with the task's ID, name, and
+        serialized attributes, and uses cron-specific trigger arguments obtained from the schedule.
+        If a schedule is not recognized as a cron schedule, a ValueError is raised.
+        
+        Parameters:
+            task: A Task object containing scheduling and metadata information.
+            reschedule: Boolean flag for rescheduling tasks (currently not used).
+        
+        Raises:
+            ValueError: If a schedule is not marked as a cron schedule.
+        """
         for schedule in task.on.schedule:
             if schedule.cron:
                 trigger = "cron"
@@ -44,7 +68,17 @@ class TimetableLoader:
 
     def load(self, timetable: Timetable):
         """
-        Load items from task file.
+        Load enabled tasks from the given timetable.
+        
+        Iterates over the tasks in the provided timetable and schedules each task that is enabled
+        (i.e. where task.meta.enabled is True). The method returns the TimetableLoader instance,
+        allowing for call chaining.
+        
+        Args:
+            timetable: Timetable object containing tasks to be loaded.
+        
+        Returns:
+            TimetableLoader: The instance after loading enabled tasks.
         """
         logger.info(f"Loading tasks from timetable. Source: {timetable}")
         for task in timetable.tasks:
@@ -54,6 +88,20 @@ class TimetableLoader:
         return self
 
     def observe(self, timetable: Timetable):
+        """
+        Start a filesystem observer for monitoring changes in the task file's directory.
+        
+        This method creates a FileChangeHandler using the source file path from the timetable's metadata
+        and schedules an Observer to watch for modifications in the parent directory of the source file.
+        The observer is started immediately, and the loader instance is returned to allow method chaining.
+        
+        Args:
+            timetable (Timetable): Timetable containing metadata with the source file path under 
+                the key Timetable.SOURCE_ATTRIBUTE.
+        
+        Returns:
+            TimetableLoader: The loader instance with an active filesystem observer.
+        """
         logger.info("Starting filesystem observer")
         # Create an instance of FileChangeHandler with the scheduler.
         source = Path(timetable.meta[Timetable.SOURCE_ATTRIBUTE])
@@ -69,6 +117,16 @@ class TimetableLoader:
 # ruff: noqa: ERA001
 class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
     def __init__(self, path: Path, loader: TimetableLoader):
+        """
+        Initialize a FileChangeHandler for monitoring file modifications.
+        
+        Stores the file path to watch, associates the handler with a timetable loader and its
+        scheduler, and sets an initial timestamp to track file modification events.
+        
+        Args:
+            path: The file path to monitor.
+            loader: The TimetableLoader instance managing task scheduling.
+        """
         self.source = path
         self.loader = loader
         # self.source = self.seeder.source
@@ -76,6 +134,18 @@ class FileChangeHandler(FileSystemEventHandler):  # pragma: nocover
         self.last_modified = time.time()
 
     def on_modified(self, event):
+        """
+        Handle file modification events to update scheduled cron jobs.
+        
+        This method debounces rapid successive events and processes file modifications only if the
+        changed file matches the monitored source. It then updates the scheduler by:
+          - Removing jobs that no longer appear in the cron job definitions.
+          - Adding new enabled jobs that are not already scheduled.
+          - Rescheduling existing enabled jobs.
+        
+        Args:
+            event: The file system event triggered by a modification.
+        """
         if time.time() - self.last_modified < 1:
             return
 

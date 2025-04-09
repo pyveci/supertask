@@ -47,6 +47,11 @@ def cli(
     verbose: bool,
     debug: bool,
 ):
+    """
+    Initialize the CLI context with logging, job store, and task manager.
+    
+    This function configures logging when verbose mode is enabled and creates a job store from the given address and optional schema and table names. It then instantiates a task manager (supertask) with options for pre-deleting and pre-seeding jobs. The resulting job store and task manager are stored in the Click context’s metadata for later use by subcommands.
+    """
     if verbose:
         setup_logging(debug=debug)
     store = JobStore \
@@ -71,7 +76,15 @@ def cli(
 @click.pass_context
 def run(ctx: click.Context, taskfile: str):
     """
-    Run task manager.
+    Execute the task manager with a specified timetable file.
+    
+    This command loads a timetable from the provided file and configures the task manager using
+    the timetable's namespace. It then loads the timetable into the scheduler, starts the task manager,
+    and runs it indefinitely.
+    
+    Parameters:
+        ctx (click.Context): Context containing the preconfigured task manager.
+        taskfile (str): Path to the file defining the timetable.
     """
     supertask: Supertask = ctx.meta["supertask"]
     timetable = Timetable.load(taskfile)

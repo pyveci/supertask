@@ -51,6 +51,14 @@ def test_supertask_stores_seeded_file(caplog, job_store_address, taskfile_yaml):
     ["memory://", "postgresql://postgres:postgres@localhost:5433", "crate://crate@localhost/?schema=testdrive"],
 )
 def test_supertask_stores_seeded_url(caplog, job_store_address, taskfile_yaml_url):
+    """
+    Test Supertask scheduling from a YAML URL.
+    
+    Verifies that a Supertask instance configured with a job store address and a YAML
+    task URL loads tasks via TimetableLoader, starts the scheduler, and logs the expected
+    steps including scheduler configuration, task loading from file, tentative job
+    addition, scheduler start, and job insertion of "Example Python reference".
+    """
     check_store(job_store_address)
 
     st = Supertask(store=job_store_address, pre_delete_jobs=True, pre_seed_jobs=taskfile_yaml_url)
@@ -66,6 +74,14 @@ def test_supertask_stores_seeded_url(caplog, job_store_address, taskfile_yaml_ur
 
 
 def dummy_job(param1: str):
+    """
+    A dummy job function for testing purposes.
+    
+    This placeholder function is used in scheduling tests and does not perform any operations.
+    
+    Parameters:
+        param1 (str): A dummy parameter that is ignored.
+    """
     pass
 
 
