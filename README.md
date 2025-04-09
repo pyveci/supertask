@@ -2,7 +2,7 @@
 
 Supertask is a convenience task runner for programming recurrent or otherwise
 scheduled jobs, based on the excellent [APScheduler], [FastAPI], [Pydantic],
-and [SQLAlchemy] packages, amongst others.
+[SQLAlchemy], and [uv] packages, amongst others.
 
 You can use Supertask to invoke time-driven actions like the venerable [cron]
 daemon and the contemporary [systemd timers] are doing it. It can be used both
@@ -78,6 +78,7 @@ See [Supertask Sandbox].
 [Supertask Installation]: https://supertask.readthedocs.io/install.html
 [Supertask Sandbox]: https://supertask.readthedocs.io/sandbox.html
 [Source code]: https://github.com/pyveci/supertask
+[uv]: https://docs.astral.sh/uv/
 
 [badge-ci]: https://github.com/pyveci/supertask/actions/workflows/main.yml/badge.svg
 [badge-coverage]: https://codecov.io/gh/pyveci/supertask/branch/main/graph/badge.svg
