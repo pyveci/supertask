@@ -47,6 +47,24 @@ def cli(
     verbose: bool,
     debug: bool,
 ):
+    """
+    Initializes logging, job store, and task management for the CLI.
+    
+    Configures the application by enabling logging when verbose mode is active, creating a
+    JobStore instance using the specified SQLAlchemy URL along with its schema and table options,
+    and initializing a Supertask with job management flags. The created store and supertask are
+    stored in the Click context metadata for subsequent command use.
+    
+    Args:
+        store_address (str): SQLAlchemy URL for connecting to the job store.
+        store_schema_name (str): Optional schema name for the job store.
+        store_table_name (str): Name of the table within the job store.
+        pre_delete_jobs (bool): If True, delete existing jobs before startup.
+        pre_seed_jobs (str): Optional configuration to pre-seed jobs.
+        http_listen_address (str): Address for the HTTP API service (default "localhost:4243").
+        verbose (bool): Enable verbose logging.
+        debug (bool): Enable debug-level logging.
+    """
     if verbose:
         setup_logging(debug=debug)
     store = JobStore \
@@ -71,7 +89,14 @@ def cli(
 @click.pass_context
 def run(ctx: click.Context, taskfile: str):
     """
-    Run task manager.
+    Execute task manager with a timetable configuration.
+    
+    Loads a timetable from the provided file, configures the task manager with the timetable's
+    namespace, loads the schedule into its scheduler, and starts the task manager, which then runs
+    indefinitely.
+    
+    Args:
+        taskfile: Path to the file containing the timetable configuration.
     """
     supertask: Supertask = ctx.meta["supertask"]
     timetable = Timetable.load(taskfile)

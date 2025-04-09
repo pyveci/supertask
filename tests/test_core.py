@@ -66,11 +66,26 @@ def test_supertask_stores_seeded_url(caplog, job_store_address, taskfile_yaml_ur
 
 
 def dummy_job(param1: str):
+    """
+    A placeholder job function for scheduler tests.
+    
+    This function is used as a no-operation stub for simulating a scheduled job.
+    It accepts a single parameter to conform to job signatures but performs no actions.
+    
+    Args:
+        param1 (str): A dummy parameter for testing purposes.
+    """
     pass
 
 
 def test_supertask_cratedb_store(caplog):
     # Create a job using Supertask.
+    """
+    Test that a scheduled job is correctly persisted in a CrateDB job store.
+    
+    This test sets up a CrateDB job store using Supertask, schedules a dummy job with a specified future
+    run time, and verifies that the job record is properly inserted into the designated schema and table.
+    """
     job_store_address = "crate://crate@localhost/"
     check_store(job_store_address)
     st = Supertask(JobStore(address=job_store_address, schema="testdrive"), pre_delete_jobs=True).configure()
