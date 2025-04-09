@@ -2,15 +2,15 @@ import click
 from dotenv import find_dotenv, load_dotenv
 
 from supertask.core import Supertask
-from supertask.model import JobStoreLocation
-from supertask.provision.seeder import JobSeeder
+from supertask.load import TimetableLoader
+from supertask.model import JobStore, Timetable
 from supertask.util import setup_logging
 
 # TODO: Gate behind an environment variable?
 load_dotenv(find_dotenv())
 
 
-@click.command()
+@click.group()
 @click.option("--store-address", envvar="ST_STORE_ADDRESS", type=str, required=True, help="SQLAlchemy URL of job store")
 @click.option(
     "--store-schema-name", envvar="ST_STORE_SCHEMA_NAME", type=str, required=False, help="Job store database schema"
@@ -28,6 +28,7 @@ load_dotenv(find_dotenv())
     "--http-listen-address",
     envvar="ST_HTTP_LISTEN_ADDRESS",
     type=str,
+    default="localhost:4243",
     required=False,
     help="HTTP API service listen address",
 )
@@ -48,17 +49,39 @@ def cli(
 ):
     if verbose:
         setup_logging(debug=debug)
-    store_location = JobStoreLocation(address=store_address)
-    if store_schema_name:
-        store_location.schema = store_schema_name
-    if store_table_name:
-        store_location.table = store_table_name
-    st = Supertask(store=store_location, pre_delete_jobs=pre_delete_jobs, pre_seed_jobs=pre_seed_jobs)
+    store = JobStore \
+        .from_address(address=store_address) \
+        .with_options(schema=store_schema_name, table=store_table_name)  # fmt: skip
+    supertask = Supertask(
+        store=store,
+        pre_delete_jobs=pre_delete_jobs,
+        pre_seed_jobs=pre_seed_jobs,
+    )
+    """
     if pre_seed_jobs:
-        js = JobSeeder(source=pre_seed_jobs, scheduler=st.scheduler)
-        js.seed_jobs()
-    st.start(listen_http=http_listen_address)
-    st.wait()
+        js = TimetableLoader(scheduler=st.scheduler)
+        js.load(Timetable.load(pre_seed_jobs))
+    """
+    ctx.meta["store"] = store
+    ctx.meta["supertask"] = supertask
+
+
+@cli.command()
+@click.argument("taskfile", type=str)
+@click.pass_context
+def run(ctx: click.Context, taskfile: str):
+    """
+    Run task manager.
+    """
+    supertask: Supertask = ctx.meta["supertask"]
+    timetable = Timetable.load(taskfile)
+    supertask.with_namespace(timetable.namespace).configure()
+
+    tl = TimetableLoader(scheduler=supertask.scheduler)
+    tl.load(timetable)
+    supertask.start()
+    # .with_http_server(listen_http=ctx.parent.params["http_listen_address"]) \  # noqa: ERA001
+    supertask.run_forever()
 
 
 if __name__ == "__main__":

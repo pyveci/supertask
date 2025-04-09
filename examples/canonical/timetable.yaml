@@ -1,0 +1,54 @@
+# A Supertask timetable file for defining multiple tasks
+# to be invoked once or on schedule.
+#
+# A schedule or a timetable consists of a list of times at which possible tasks,
+# events, or actions are intended to take place, or of a sequence of events in
+# the chronological order in which such things are intended to take place.
+#
+# Synopsis:
+#
+#   supertask push examples/minimal/timetable.yaml
+#   supertask run
+#
+# [1] https://supertask.readthedocs.io/
+# [2] https://en.wikipedia.org/wiki/Timetable
+# [3] https://en.wikipedia.org/wiki/Cron
+---
+
+meta:
+  type: supertask-timetable
+  version: 1
+  generator: supertask-v0.0.0
+
+tasks:
+
+  # Task definition using a Python module entrypoint reference.
+  - meta:
+      id: "lKPzlamA"
+      name: Example Python reference
+      description: Run a Python function every five seconds.
+      enabled: true
+
+    # Schedule task every five seconds using extended crontab syntax.
+    # https://supertask.readthedocs.io/handbook.html#extended-crontab-syntax
+    on:
+      schedule:
+        - cron: "*/5 * * * * * *"
+
+    steps:
+
+      - name: Invoke example waiter
+        uses: "python-entrypoint"
+        run: "supertask.contrib.testing:example_waiter"
+        args: []
+        kwargs:
+          jitter: 0.42
+
+      - name: Invoke notifier
+        if: false
+        uses: "python-entrypoint"
+        run: "supertask.contrib.notify:slack"
+        args: []
+        kwargs:
+          channel: sig-automation-testdrive
+          content: Hello, World!

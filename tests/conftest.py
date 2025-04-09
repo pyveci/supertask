@@ -14,10 +14,10 @@ def prune_environment():
 
 
 @pytest.fixture(scope="session")
-def cronjobs_json_file() -> str:
-    return "cronjobs.json"
+def taskfile_yaml() -> str:
+    return "examples/canonical/timetable.yaml"
 
 
 @pytest.fixture(scope="session")
-def cronjobs_json_url() -> str:
-    return "https://github.com/pyveci/supertask/raw/main/cronjobs.json"
+def taskfile_yaml_url() -> str:
+    return "https://github.com/pyveci/supertask/raw/main/examples/canonical/timetable.yaml"

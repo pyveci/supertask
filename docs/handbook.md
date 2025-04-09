@@ -66,6 +66,7 @@ Traditional Unix Cron uses just 5 components to define schedules, like
 */10 * * * *
 ```
 -- https://crontab.guru/every-minute
+<br>
 -- https://crontab.guru/every-ten-minutes
 
 APScheduler provides an extended 6- or 7-tuple syntax, adding an optional scheduling

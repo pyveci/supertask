@@ -7,7 +7,7 @@ requires = [
 
 [project]
 name = "supertask"
-description = "A convenience job scheduler."
+description = "A convenience job scheduler based on APScheduler, FastAPI, Pydantic, SQLAlchemy, and uv."
 readme = "README.md"
 keywords = [
   "apscheduler",
@@ -91,13 +91,14 @@ dependencies = [
   "jinja2<4",
   "markupsafe<4",
   "pueblo[fileio]",
-  "pydantic<3",
+  "pydantic>=2,<3",
   "python-dotenv[cli]<2",
   "python-multipart==0.0.20",
   "pytz",
   "sqlalchemy-cratedb==0.41.0",
   "uvicorn<0.35",
   "watchdog<7",
+  "yamlcore==0.0.4",
 ]
 optional-dependencies.develop = [
   "mypy<1.16",
