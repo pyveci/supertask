@@ -43,6 +43,11 @@ def cli(
     verbose: bool,
     debug: bool,
 ):
+    """
+    A convenience job scheduler based on APScheduler, FastAPI, Pydantic, SQLAlchemy, and uv.
+
+    Initialize logging, job store, and task management for the CLI.
+    """
     if verbose:
         setup_logging(debug=debug)
     store = JobStore \
