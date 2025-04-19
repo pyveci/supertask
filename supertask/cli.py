@@ -44,9 +44,9 @@ def cli(
     debug: bool,
 ):
     """
-    A convenience job scheduler based on APScheduler, FastAPI, Pydantic, SQLAlchemy, and uv.
-
-    Initialize logging, job store, and task management for the CLI.
+    Initializes the CLI context for the job scheduler application.
+    
+    Sets up logging, creates the job store, and prepares the task management system based on CLI options. Stores initialized components in the Click context for use by subcommands.
     """
     if verbose:
         setup_logging(debug=debug)
