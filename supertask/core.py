@@ -12,6 +12,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.util import ref_to_obj
 from halo import Halo
 from icecream import ic
+from pueblo.sfa.core import ApplicationAddress, SingleFileApplication
 
 from supertask.model import JobStore, Settings, Task
 from supertask.store.cratedb import CrateDBSQLAlchemyJobStore
@@ -148,6 +149,16 @@ class TaskRunner:
             if step.uses == "python-entrypoint":
                 func = ref_to_obj(step.run)
                 retval = func(*step.args, **step.kwargs)
+                logger.info(f"Result: {retval}")
+            elif step.uses == "python-file":
+                # TODO: Refactor into single-line invocation when possible.
+                address = ApplicationAddress.from_spec(step.run)
+                app = SingleFileApplication(address=address)
+                app.install()
+                app.load_any()
+                app.import_module()
+                app._entrypoint = getattr(app._module, "run", None)
+                retval = app.run(*step.args, **step.kwargs)
                 logger.info(f"Result: {retval}")
             else:
                 raise RuntimeError(f"Unknown step type: {step.uses}")
