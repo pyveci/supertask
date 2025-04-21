@@ -23,3 +23,5 @@
   https://supertask.readthedocs.io/
 - Refactored data model and CLI
 - Removed HTTP service
+- Added the ability to use Python files including inline-defined task metadata, e.g.
+  `supertask run my_task.py`
