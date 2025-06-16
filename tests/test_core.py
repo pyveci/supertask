@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 import sqlalchemy as sa
-from cratedb_toolkit.util import DatabaseAdapter
+from cratedb_toolkit.util.database import DatabaseAdapter
 
 from supertask.core import Supertask
 from supertask.load import TimetableLoader
