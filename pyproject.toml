@@ -121,7 +121,7 @@ optional-dependencies.release = [
   "twine<7",
 ]
 optional-dependencies.test = [
-  "cratedb-toolkit==0.0.35",
+  "cratedb-toolkit==0.0.37",
   "httpx<0.29",
   "psycopg2-binary<3",
   "pytest<9",
