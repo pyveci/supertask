@@ -125,7 +125,7 @@ optional-dependencies.test = [
   "httpx<0.29",
   "psycopg2-binary<3",
   "pytest<9",
-  "pytest-cov<7",
+  "pytest-cov<8",
   "pytest-mock<4",
 ]
 urls.Changelog = "https://github.com/pyveci/supertask/blob/main/CHANGES.md"
