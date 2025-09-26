@@ -109,7 +109,7 @@ optional-dependencies.develop = [
   "validate-pyproject<1",
 ]
 optional-dependencies.docs = [
-  "furo==2025.7.19",
+  "furo==2025.9.25",
   "myst-parser[linkify]>=0.18,<5",
   "sphinx-copybutton",
   "sphinx-design-elements<1",
