@@ -96,7 +96,7 @@ dependencies = [
   "python-multipart==0.0.20",
   "pytz",
   "sqlalchemy-cratedb==0.41.0",
-  "uvicorn<0.40",
+  "uvicorn<0.41",
   "watchdog<7",
   "yamlcore==0.0.4",
 ]
