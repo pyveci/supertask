@@ -124,7 +124,7 @@ optional-dependencies.test = [
   "cratedb-toolkit==0.0.41",
   "httpx<0.29",
   "psycopg2-binary<3",
-  "pytest<9",
+  "pytest<10",
   "pytest-cov<8",
   "pytest-mock<4",
 ]
