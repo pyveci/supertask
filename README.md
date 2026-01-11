@@ -57,6 +57,12 @@ See [Supertask Handbook].
 
 See [Supertask Sandbox].
 
+## Supported by
+
+[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSourceSupport)
+
+Special thanks to the people at JetBrains s.r.o. for supporting us with
+excellent development tooling.
 
 
 [APScheduler]: https://pypi.org/project/APScheduler/
