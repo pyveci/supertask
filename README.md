@@ -1,13 +1,5 @@
 # Supertask
 
-Supertask is a convenience task runner for programming recurrent or otherwise
-scheduled jobs, based on the excellent [APScheduler], [FastAPI], [Pydantic],
-[SQLAlchemy], and [uv] packages, amongst others.
-
-You can use Supertask to invoke time-driven actions like the venerable [cron]
-daemon and the contemporary [systemd timers] are doing it. It can be used both
-as a standalone program/service, and as a library.
-
 [![CI][badge-ci]][project-ci]
 [![Coverage][badge-coverage]][project-coverage]
 [![License][badge-license]][project-license]
@@ -25,6 +17,16 @@ as a standalone program/service, and as a library.
 | [Source code]
 | [License]
 | [Community Forum]
+
+## About
+
+Supertask is a convenience task runner for programming recurrent or otherwise
+scheduled jobs, based on the excellent [APScheduler], [FastAPI], [Pydantic],
+[SQLAlchemy], and [uv] packages, amongst others.
+
+You can use Supertask to invoke time-driven actions like the venerable [cron]
+daemon and the contemporary [systemd timers] are doing it. It can be used both
+as a standalone program/service, and as a library.
 
 ## Features
 
