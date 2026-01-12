@@ -4,6 +4,7 @@ import getpass
 import hashlib
 import json
 import logging
+import os
 import re
 import socket
 import typing as t
@@ -13,6 +14,8 @@ import yaml
 import yamlcore
 from pueblo.io import to_io
 from pydantic import BaseModel, Field
+
+from supertask.util import read_inline_script_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -118,7 +121,7 @@ class Step(BaseModel):
     uses: str
     run: str
     args: t.List[ScalarType] = Field(default_factory=list)
-    kwargs: t.Dict[str, ScalarType] = Field(default_factory=dict)
+    kwargs: t.Dict[str, t.Any] = Field(default_factory=dict)
     if_: bool = Field(alias="if", default=True)
 
 
@@ -135,15 +138,15 @@ class Timetable(BaseModel):
     Manage information about a whole timetable, including multiple task definitions.
     """
 
-    meta: t.Dict[str, t.Any]
-    tasks: t.List[Task]
+    meta: t.Dict[str, t.Any] = Field(default_factory=dict)
+    tasks: t.List[Task] = Field(default_factory=list)
 
     NAMESPACE_ATTRIBUTE: t.ClassVar = "namespace"
     SOURCE_ATTRIBUTE: t.ClassVar = "taskfile"
 
     def model_post_init(self, __context: t.Any) -> None:
         """
-        Adjust model after initialization.
+        Adjust the model after initialization.
         """
         # If the timetable file or resource does not provide a namespace identifier, provide an ephemeral one.
         if self.NAMESPACE_ATTRIBUTE not in self.meta or not self.meta[self.NAMESPACE_ATTRIBUTE]:
@@ -174,7 +177,7 @@ class Timetable(BaseModel):
     @classmethod
     def load(cls, taskfile: str):
         """
-        Load task definitions from file or resource.
+        Load task definitions from a file or resource.
         """
         logger.info(f"Loading task(s) from file. Source: {taskfile}")
 
@@ -184,11 +187,39 @@ class Timetable(BaseModel):
             elif taskfile.endswith(".yaml") or taskfile.endswith(".yml"):
                 # Use YAML 1.2 compliant loading, otherwise "on" will be translated to `True`, for example.
                 data = yaml.load(f, Loader=yamlcore.CoreLoader)  # noqa: S506
+            elif taskfile.endswith(".py"):
+                return cls.from_python(taskfile)
             else:
                 raise NotImplementedError(f"Task or timetable file type not supported: {taskfile}")
-            data.setdefault("meta", {})
             data["meta"][cls.SOURCE_ATTRIBUTE] = taskfile
             return cls(**data)
+
+    @classmethod
+    def from_python(cls, pythonfile: str):
+        tt = cls()
+        pythonfile_path = Path(pythonfile)
+        tt.meta[cls.SOURCE_ATTRIBUTE] = pythonfile
+        task_data = read_inline_script_metadata("task", pythonfile_path.read_text())
+        if "cron" not in task_data:
+            raise ValueError("Currently, only cron-based schedules are implemented")
+        # FIXME: https://github.com/pyveci/supertask/issues/209
+        os.environ.update(task_data.get("env", {}))
+        tt.tasks.append(
+            Task(
+                meta=TaskMetadata(id="python", name=pythonfile_path.stem, description="TODO", enabled=True),
+                on=Event(schedule=[ScheduleItem(cron=task_data["cron"])]),
+                steps=[
+                    Step(
+                        name=pythonfile_path.stem,
+                        uses="python-file",
+                        run=f"{pythonfile_path}:run",
+                        args=[],
+                        kwargs=task_data.get("options", {}),
+                    ),
+                ],
+            )
+        )
+        return tt
 
 
 class CronJob(BaseModel):

@@ -91,12 +91,13 @@ dependencies = [
   "icecream<3",
   "jinja2<4",
   "markupsafe<4",
-  "pueblo[fileio]",
+  "pueblo[fileio,sfa-full]",
   "pydantic>=2,<3",
   "python-dotenv[cli]<2",
   "python-multipart<0.0.21",
   "pytz",
   "sqlalchemy-cratedb==0.41.0",
+  "tomli<3",
   "uvicorn<0.41",
   "watchdog<7",
   "yamlcore==0.0.4",
@@ -188,9 +189,8 @@ lint.extend-ignore = [
   "S108",
 ]
 
-lint.per-file-ignores."examples/*" = [ "T201" ] # Allow `print`
-lint.per-file-ignores."test_*.py" = [ "S101" ]  # Allow use of `assert`, and `print`.
-lint.per-file-ignores."tests/*" = [ "S101" ]    # Allow use of `assert`, and `print`.
+lint.per-file-ignores."test_*.py" = [ "S101" ] # Allow use of `assert`, and `print`.
+lint.per-file-ignores."tests/*" = [ "S101" ]   # Allow use of `assert`, and `print`.
 
 [tool.pytest.ini_options]
 addopts = """
