@@ -151,13 +151,16 @@ class TaskRunner:
                 retval = func(*step.args, **step.kwargs)
                 logger.info(f"Result: {retval}")
             elif step.uses == "python-file":
-                # TODO: Refactor into single-line invocation when possible.
+                # TODO: Refactor the invocation of pueblo's `SingleFileApplication`
+                #       into a one liner again, when possible.
                 address = ApplicationAddress.from_spec(step.run)
                 app = SingleFileApplication(address=address)
                 app.install()
                 app.load_any()
                 app.import_module()
                 app._entrypoint = getattr(app._module, "run", None)
+                if app._entrypoint is None:
+                    raise RuntimeError(f"Python file {step.run} does not define a 'run' function")
                 retval = app.run(*step.args, **step.kwargs)
                 logger.info(f"Result: {retval}")
             else:
