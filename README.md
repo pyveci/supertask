@@ -10,8 +10,12 @@ as a standalone program/service, and as a library.
 
 [![CI][badge-ci]][project-ci]
 [![Coverage][badge-coverage]][project-coverage]
-[![Downloads per month][badge-downloads-per-month]][project-downloads]
 [![License][badge-license]][project-license]
+[![Downloads per month][badge-downloads-per-month]][project-downloads]
+
+[![Supported Python versions][badge-python-versions]][project-pypi]
+[![Status][badge-status]][project-pypi]
+[![Package version][badge-package-version]][project-pypi]
 [![Release Notes][badge-release-notes]][project-release-notes]
 
 » [Documentation]
@@ -34,16 +38,12 @@ as a standalone program/service, and as a library.
 
 ## Status
 
-Please note that Supertask is a work in progress, and to be considered
-alpha-quality software. Contributions of all kinds are much welcome,
-in order to make it more solid, and to add features.
+Please note that Supertask is alpha software and a work in progress.
+Contributions of all kinds are much welcome, in order to make it
+more solid, and to add features.
 
 Breaking changes should be expected until a 1.0 release, so applying
-version pinning is strongly recommended when consuming the packages.
-
-[![Status][badge-status]][project-pypi]
-[![Package version][badge-package-version]][project-pypi]
-[![Supported Python versions][badge-python-versions]][project-pypi]
+version pinning is strongly recommended when consuming the package.
 
 ## Installation
 
