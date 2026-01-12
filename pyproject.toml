@@ -189,9 +189,8 @@ lint.extend-ignore = [
   "S108",
 ]
 
-lint.per-file-ignores."examples/*" = [ "T201" ] # Allow `print`
-lint.per-file-ignores."test_*.py" = [ "S101" ]  # Allow use of `assert`, and `print`.
-lint.per-file-ignores."tests/*" = [ "S101" ]    # Allow use of `assert`, and `print`.
+lint.per-file-ignores."test_*.py" = [ "S101" ] # Allow use of `assert`, and `print`.
+lint.per-file-ignores."tests/*" = [ "S101" ]   # Allow use of `assert`, and `print`.
 
 [tool.pytest.ini_options]
 addopts = """

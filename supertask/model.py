@@ -200,6 +200,9 @@ class Timetable(BaseModel):
         pythonfile_path = Path(pythonfile)
         tt.meta[cls.SOURCE_ATTRIBUTE] = pythonfile
         task_data = read_inline_script_metadata("task", pythonfile_path.read_text())
+        if "cron" not in task_data:
+            raise ValueError("Currently, only cron-based schedules are implemented")
+        # FIXME: https://github.com/pyveci/supertask/issues/209
         os.environ.update(task_data.get("env", {}))
         tt.tasks.append(
             Task(

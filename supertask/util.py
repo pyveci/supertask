@@ -33,7 +33,7 @@ def read_inline_script_metadata(type_: str, script: str) -> t.Dict[str, t.Any]:
     https://packaging.python.org/en/latest/specifications/inline-script-metadata/
     https://peps.python.org/pep-0723/
 
-    TODO: Synchronize with `pueblo.sfa.pep723`.
+    TODO: Synchronize with `pueblo.sfa.pep723` on the next iteration.
     """
 
     name = type_ or "script"
@@ -45,5 +45,8 @@ def read_inline_script_metadata(type_: str, script: str) -> t.Dict[str, t.Any]:
             line[2:] if line.startswith("# ") else line[1:]
             for line in matches[0].group("content").splitlines(keepends=True)
         )
-        return tomli.loads(content)
+        try:
+            return tomli.loads(content)
+        except tomli.TOMLDecodeError as e:
+            raise ValueError(f"Invalid TOML in {name} metadata block: {e}") from e
     return {}

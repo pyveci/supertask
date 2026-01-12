@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-import logging
-import os
-import sys
-import typing as t
+# ruff: noqa: ERA001, T201
 
 # /// script
 # requires-python = ">=3.9"
@@ -21,6 +18,14 @@ import typing as t
 # schemas = ["foo", "bar"]
 # table_prefixes = ["tmp_", "temp_"]
 # ///
+
+import logging
+import os
+import re
+import sys
+import time
+import typing as t
+
 import sqlalchemy as sa
 from cratedb_toolkit.model import TableAddress
 
@@ -32,23 +37,28 @@ class DatabaseCleanupTask:
     A task definition to clean up temporary tables in a database.
     """
 
-    def __init__(self, schemas: t.List[str] = None, table_prefixes: t.List[str] = None):
+    def __init__(self, schemas: t.Optional[t.List[str]] = None, table_prefixes: t.Optional[t.List[str]] = None):
         self.schemas = schemas
         self.table_prefixes = table_prefixes
         database_url = os.getenv("DATABASE_URL")
         if database_url is None:
             raise ValueError("Database URL environment variable is not set: DATABASE_URL")
-        self.engine = sa.create_engine(database_url, echo=True)
+        self.engine = sa.create_engine(database_url, echo=os.getenv("ST_SQL_ECHO", "").lower() in ("true", "1", "yes"))
 
     def run(self) -> None:
         """
         Inquire relevant table addresses and clean up temporary tables.
         """
-        with self.engine.connect() as conn:
-            for table in self.table_addresses:
-                sql = f"DROP TABLE IF EXISTS {table.fullname}"
-                logger.info(f"Dropping table {table.fullname}: {sql}")
-                conn.execute(sa.text(sql))
+        try:
+            with self.engine.connect() as conn:
+                for table in self.table_addresses:
+                    # TODO: Can CrateDB use parameterized DDL identifiers?
+                    sql = f"DROP TABLE IF EXISTS {table.fullname}"
+                    logger.info(f"Dropping table {table.fullname}: {sql}")
+                    conn.execute(sa.text(sql))
+        except Exception:
+            logger.exception("Database connection error")
+            time.sleep(1)
 
     @property
     def table_addresses(self) -> t.List[TableAddress]:
@@ -62,18 +72,24 @@ class DatabaseCleanupTask:
         """
         inspector = sa.inspect(self.engine)
         bucket: t.List[TableAddress] = []
-        for schema in inspector.get_schema_names():
-            if schema in self.schemas:
-                tables = inspector.get_table_names(schema=schema)
-                for table in tables:
-                    for prefix in self.table_prefixes:
-                        if table.startswith(prefix):
-                            bucket.append(TableAddress(schema=schema, table=table))
+
+        # Only check tables from schemas we're interested in.
+        schemas_to_check = [schema for schema in inspector.get_schema_names() if schema in self.schemas]
+
+        # Pre-compile a regex pattern for efficiency if many tables need to be checked.
+        prefix_pattern = "^(" + "|".join(re.escape(prefix) for prefix in self.table_prefixes) + ")"
+        pattern = re.compile(prefix_pattern)
+
+        for schema in schemas_to_check:
+            tables = inspector.get_table_names(schema=schema)
+            for table in tables:
+                if pattern.match(table):
+                    bucket.append(TableAddress(schema=schema, table=table))
         return bucket
 
 
 def run(**kwargs):
-    logging.basicConfig(level=logging.INFO, handlers=[sys.stderr])
+    logging.basicConfig(level=logging.INFO, stream=sys.stderr)
     task = DatabaseCleanupTask(**kwargs)
     task.run()
 
