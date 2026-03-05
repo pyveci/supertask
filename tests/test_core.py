@@ -65,6 +65,29 @@ def test_supertask_stores_seeded_url(caplog, job_store_address, taskfile_yaml_ur
     assert 'Added job "Example Python reference" to job store "default"' in caplog.messages
 
 
+@pytest.mark.parametrize(
+    "job_store_address",
+    [
+        "memory://",
+        "postgresql://postgres:postgres@localhost:5433",
+        "crate://crate@localhost/?schema=testdrive",
+    ],
+)
+def test_supertask_python_file(caplog, job_store_address, taskfile_python):
+    check_store(job_store_address)
+
+    st = Supertask(store=job_store_address, pre_delete_jobs=True).configure()
+    tt = Timetable.load(taskfile_python)
+    TimetableLoader(scheduler=st.scheduler).load(tt)
+    st.start()
+
+    assert "Configuring scheduler" in caplog.messages
+    assert "Loading task(s) from file. Source: examples/minimal/hellodb.py" in caplog.text
+    assert "Adding job tentatively -- it will be properly scheduled when the scheduler starts" in caplog.messages
+    assert "Starting scheduler" in caplog.messages
+    assert 'Added job "hellodb" to job store "default"' in caplog.messages
+
+
 def dummy_job(param1: str):
     pass
 

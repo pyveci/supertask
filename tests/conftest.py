@@ -21,3 +21,8 @@ def taskfile_yaml() -> str:
 @pytest.fixture(scope="session")
 def taskfile_yaml_url() -> str:
     return "https://github.com/pyveci/supertask/raw/main/examples/canonical/timetable.yaml"
+
+
+@pytest.fixture(scope="session")
+def taskfile_python() -> str:
+    return "examples/minimal/hellodb.py"
