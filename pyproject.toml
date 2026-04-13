@@ -111,7 +111,7 @@ optional-dependencies.develop = [
 ]
 optional-dependencies.docs = [
   "furo==2025.12.19",
-  "myst-parser[linkify]>=0.18,<5",
+  "myst-parser[linkify]>=3.0.1,<5",
   "sphinx-copybutton",
   "sphinx-design-elements<1",
   "sphinxcontrib-mermaid<2",
