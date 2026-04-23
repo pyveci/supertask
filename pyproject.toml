@@ -92,7 +92,7 @@ dependencies = [
   "jinja2<4",
   "markupsafe<4",
   "pueblo[fileio]",
-  "pydantic>=2,<3",
+  "pydantic>=2.13.3,<3",
   "python-dotenv[cli]<2",
   "python-multipart<0.0.21",
   "pytz",
