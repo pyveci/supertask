@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 2026/05/14 v0.0.0
 - Make it work
 - Added documentation
 - Added FastAPI endpoint
