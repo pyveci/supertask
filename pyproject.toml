@@ -22,7 +22,7 @@ keywords = [
   "timetable",
   "toolkit",
 ]
-license = "AGPL-3.0-or-later"
+license = "MIT"
 license-files = [ "LICENSE" ]
 authors = [
   { name = "Walter Behmann", email = "walter@crate.io" },
