@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Dependencies: Updated to sqlalchemy-cratedb 0.43.0
 
 ## 2026/05/14 v0.0.0
 - Make it work
