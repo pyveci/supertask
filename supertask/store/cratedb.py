@@ -49,17 +49,9 @@ class CrateDBSQLAlchemyJobStore(SQLAlchemyJobStore):
     def __init__(self, *args, **kwargs):
         self.patchme()
         super().__init__(*args, **kwargs)
+        from sqlalchemy_cratedb.support import refresh_after_dml
 
-        def receive_after_execute(
-            conn: sa.engine.Connection, clauseelement, multiparams, params, execution_options, result
-        ):
-            """
-            Run a `REFRESH TABLE ...` command after each DML operation (INSERT, UPDATE, DELETE).
-            """
-            if isinstance(clauseelement, (sa.sql.Insert, sa.sql.Update, sa.sql.Delete)):
-                conn.execute(sa.text(f"REFRESH TABLE {clauseelement.table}"))
-
-        sa.event.listen(self.engine, "after_execute", receive_after_execute)
+        refresh_after_dml(self.engine)
 
     def patchme(self):
         """
@@ -67,39 +59,12 @@ class CrateDBSQLAlchemyJobStore(SQLAlchemyJobStore):
 
         """
         from sqlalchemy_cratedb import dialect
-        from sqlalchemy_cratedb.compiler import CrateDDLCompiler, CrateTypeCompiler
+        from sqlalchemy_cratedb.compiler import CrateTypeCompiler
 
         def visit_BLOB(self, type_, **kw):
             return "STRING"
 
-        def visit_FLOAT(self, type_, **kw):
-            """
-            From `sqlalchemy.sql.sqltypes.Float`.
-
-            When a :paramref:`.Float.precision` is not provided in a
-            :class:`_types.Float` type some backend may compile this type as
-            an 8 bytes / 64 bit float datatype. To use a 4 bytes / 32 bit float
-            datatype a precision <= 24 can usually be provided or the
-            :class:`_types.REAL` type can be used.
-            This is known to be the case in the PostgreSQL and MSSQL dialects
-            that render the type as ``FLOAT`` that's in both an alias of
-            ``DOUBLE PRECISION``. Other third party dialects may have similar
-            behavior.
-            """
-            if not type_.precision:
-                return "FLOAT"
-            elif type_.precision <= 24:
-                return "FLOAT"
-            else:
-                return "DOUBLE"
-
         CrateTypeCompiler.visit_BLOB = visit_BLOB
-        CrateTypeCompiler.visit_FLOAT = visit_FLOAT
-
-        def visit_create_index(self, create, **kw):
-            return "SELECT 1;"
-
-        CrateDDLCompiler.visit_create_index = visit_create_index
 
         dialect.colspecs.update(
             {
