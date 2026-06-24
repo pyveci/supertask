@@ -96,7 +96,7 @@ dependencies = [
   "python-dotenv[cli]<2",
   "python-multipart<0.0.33",
   "pytz",
-  "sqlalchemy-cratedb==0.41.0",
+  "sqlalchemy-cratedb==0.43.1",
   "tomli<3",
   "uvicorn<0.50",
   "watchdog<7",
