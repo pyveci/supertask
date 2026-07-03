@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 2026/07/03 v0.1.0
+## 2026/07/03 v0.1.1
 
 - Dependencies: Updated to sqlalchemy-cratedb 0.43.0
 - Runtime: Removed support for Python 3.9
