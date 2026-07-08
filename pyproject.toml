@@ -102,7 +102,7 @@ dependencies = [
   "yamlcore==0.0.4",
 ]
 optional-dependencies.develop = [
-  "mypy<2.2",
+  "mypy<2.3",
   "poethepoet<1",
   "pyproject-fmt<3",
   "ruff<0.16",
