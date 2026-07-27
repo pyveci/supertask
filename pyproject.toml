@@ -119,7 +119,7 @@ optional-dependencies.docs = [
 ]
 optional-dependencies.release = [
   "build<2",
-  "twine<7",
+  "twine<8",
 ]
 optional-dependencies.test = [
   "cratedb-toolkit==0.0.49",
