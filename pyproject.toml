@@ -97,7 +97,7 @@ dependencies = [
   "pytz",
   "sqlalchemy-cratedb==0.43.1",
   "tomli<3",
-  "uvicorn<0.53",
+  "uvicorn<0.54",
   "watchdog<7",
   "yamlcore==0.0.4",
 ]
