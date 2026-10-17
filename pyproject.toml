@@ -178,8 +178,6 @@ lint.select = [
 lint.extend-ignore = [
   # zip() without an explicit strict= parameter
   "B905",
-  # df is a bad variable name. Be kinder to your future self.
-  "PD901",
   # Unnecessary variable assignment before `return` statement
   "RET504",
   # Unnecessary `elif` after `return` statement
