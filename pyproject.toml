@@ -100,7 +100,7 @@ dependencies = [
   "tomli<3",
   "uvicorn<0.55",
   "watchdog<7",
-  "yamlcore==0.0.4",
+  "yamlcore==0.1.1",
 ]
 optional-dependencies.develop = [
   "mypy<2.5",
